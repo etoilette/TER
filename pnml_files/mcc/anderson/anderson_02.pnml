@@ -1,0 +1,188 @@
+<?xml version="1.0"?>
+<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
+  <net id="anderson_02" type="http://www.pnml.org/version-2009/grammar/ptnet">
+    <page id="main">
+      <place id="slot_(False, False)"><name><text>slot_(False, False)</text></name></place>
+      <place id="slot_(False, True)"><name><text>slot_(False, True)</text></name></place>
+      <place id="slot_(True, False)"><name><text>slot_(True, False)</text></name><initialMarking><text>1</text></initialMarking></place>
+      <place id="next_0"><name><text>next_0</text></name><initialMarking><text>1</text></initialMarking></place>
+      <place id="next_1"><name><text>next_1</text></name></place>
+      <place id="next_2"><name><text>next_2</text></name></place>
+      <place id="next_3"><name><text>next_3</text></name></place>
+      <place id="ncs_0_0"><name><text>ncs_0_0</text></name><initialMarking><text>1</text></initialMarking></place>
+      <place id="ncs_0_1"><name><text>ncs_0_1</text></name></place>
+      <place id="ncs_1_0"><name><text>ncs_1_0</text></name><initialMarking><text>1</text></initialMarking></place>
+      <place id="ncs_1_1"><name><text>ncs_1_1</text></name></place>
+      <place id="p1_0_0"><name><text>p1_0_0</text></name></place>
+      <place id="p1_0_1"><name><text>p1_0_1</text></name></place>
+      <place id="p1_0_2"><name><text>p1_0_2</text></name></place>
+      <place id="p1_1_0"><name><text>p1_1_0</text></name></place>
+      <place id="p1_1_1"><name><text>p1_1_1</text></name></place>
+      <place id="p1_1_2"><name><text>p1_1_2</text></name></place>
+      <place id="p2_0_0"><name><text>p2_0_0</text></name></place>
+      <place id="p2_0_1"><name><text>p2_0_1</text></name></place>
+      <place id="p2_1_0"><name><text>p2_1_0</text></name></place>
+      <place id="p2_1_1"><name><text>p2_1_1</text></name></place>
+      <place id="p3_0_0"><name><text>p3_0_0</text></name></place>
+      <place id="p3_0_1"><name><text>p3_0_1</text></name></place>
+      <place id="p3_1_0"><name><text>p3_1_0</text></name></place>
+      <place id="p3_1_1"><name><text>p3_1_1</text></name></place>
+      <place id="cs_0_0"><name><text>cs_0_0</text></name></place>
+      <place id="cs_0_1"><name><text>cs_0_1</text></name></place>
+      <place id="cs_1_0"><name><text>cs_1_0</text></name></place>
+      <place id="cs_1_1"><name><text>cs_1_1</text></name></place>
+      <transition id="ncs_to_p1_0_0_0"><name><text>ncs_to_p1_0_0_0</text></name></transition>
+      <transition id="ncs_to_p1_0_0_1"><name><text>ncs_to_p1_0_0_1</text></name></transition>
+      <transition id="ncs_to_p1_0_0_2"><name><text>ncs_to_p1_0_0_2</text></name></transition>
+      <transition id="ncs_to_p1_0_1_0"><name><text>ncs_to_p1_0_1_0</text></name></transition>
+      <transition id="ncs_to_p1_0_1_1"><name><text>ncs_to_p1_0_1_1</text></name></transition>
+      <transition id="ncs_to_p1_0_1_2"><name><text>ncs_to_p1_0_1_2</text></name></transition>
+      <transition id="ncs_to_p1_1_0_0"><name><text>ncs_to_p1_1_0_0</text></name></transition>
+      <transition id="ncs_to_p1_1_0_1"><name><text>ncs_to_p1_1_0_1</text></name></transition>
+      <transition id="ncs_to_p1_1_0_2"><name><text>ncs_to_p1_1_0_2</text></name></transition>
+      <transition id="ncs_to_p1_1_1_0"><name><text>ncs_to_p1_1_1_0</text></name></transition>
+      <transition id="ncs_to_p1_1_1_1"><name><text>ncs_to_p1_1_1_1</text></name></transition>
+      <transition id="ncs_to_p1_1_1_2"><name><text>ncs_to_p1_1_1_2</text></name></transition>
+      <transition id="p1_to_p2_eq_0_2"><name><text>p1_to_p2_eq_0_2</text></name></transition>
+      <transition id="p1_to_p2_eq_0_3"><name><text>p1_to_p2_eq_0_3</text></name></transition>
+      <transition id="p1_to_p2_eq_1_2"><name><text>p1_to_p2_eq_1_2</text></name></transition>
+      <transition id="p1_to_p2_eq_1_3"><name><text>p1_to_p2_eq_1_3</text></name></transition>
+      <transition id="p1_to_p2_diff_0_0"><name><text>p1_to_p2_diff_0_0</text></name></transition>
+      <transition id="p1_to_p2_diff_0_2"><name><text>p1_to_p2_diff_0_2</text></name></transition>
+      <transition id="p1_to_p2_diff_1_0"><name><text>p1_to_p2_diff_1_0</text></name></transition>
+      <transition id="p1_to_p2_diff_1_2"><name><text>p1_to_p2_diff_1_2</text></name></transition>
+      <transition id="p2_to_p3_0_0_(True, False)"><name><text>p2_to_p3_0_0_(True, False)</text></name></transition>
+      <transition id="p2_to_p3_0_1_(False, True)"><name><text>p2_to_p3_0_1_(False, True)</text></name></transition>
+      <transition id="p2_to_p3_1_0_(True, False)"><name><text>p2_to_p3_1_0_(True, False)</text></name></transition>
+      <transition id="p2_to_p3_1_1_(False, True)"><name><text>p2_to_p3_1_1_(False, True)</text></name></transition>
+      <transition id="p3_to_cs_0_0_(True, False)"><name><text>p3_to_cs_0_0_(True, False)</text></name></transition>
+      <transition id="p3_to_cs_0_1_(False, True)"><name><text>p3_to_cs_0_1_(False, True)</text></name></transition>
+      <transition id="p3_to_cs_1_0_(True, False)"><name><text>p3_to_cs_1_0_(True, False)</text></name></transition>
+      <transition id="p3_to_cs_1_1_(False, True)"><name><text>p3_to_cs_1_1_(False, True)</text></name></transition>
+      <transition id="cs_to_ncs_0_0_(False, False)"><name><text>cs_to_ncs_0_0_(False, False)</text></name></transition>
+      <transition id="cs_to_ncs_0_1_(False, False)"><name><text>cs_to_ncs_0_1_(False, False)</text></name></transition>
+      <transition id="cs_to_ncs_1_0_(False, False)"><name><text>cs_to_ncs_1_0_(False, False)</text></name></transition>
+      <transition id="cs_to_ncs_1_1_(False, False)"><name><text>cs_to_ncs_1_1_(False, False)</text></name></transition>
+      <arc id="ncs_to_p1_0_0_0-ncs_0_0" source="ncs_0_0" target="ncs_to_p1_0_0_0"/>
+      <arc id="ncs_to_p1_0_0_0-next_0" source="next_0" target="ncs_to_p1_0_0_0"/>
+      <arc id="p1_0_0-ncs_to_p1_0_0_0" source="ncs_to_p1_0_0_0" target="p1_0_0"/>
+      <arc id="next_1-ncs_to_p1_0_0_0" source="ncs_to_p1_0_0_0" target="next_1"/>
+      <arc id="ncs_to_p1_0_0_1-ncs_0_0" source="ncs_0_0" target="ncs_to_p1_0_0_1"/>
+      <arc id="ncs_to_p1_0_0_1-next_1" source="next_1" target="ncs_to_p1_0_0_1"/>
+      <arc id="p1_0_1-ncs_to_p1_0_0_1" source="ncs_to_p1_0_0_1" target="p1_0_1"/>
+      <arc id="next_2-ncs_to_p1_0_0_1" source="ncs_to_p1_0_0_1" target="next_2"/>
+      <arc id="ncs_to_p1_0_0_2-ncs_0_0" source="ncs_0_0" target="ncs_to_p1_0_0_2"/>
+      <arc id="ncs_to_p1_0_0_2-next_2" source="next_2" target="ncs_to_p1_0_0_2"/>
+      <arc id="p1_0_2-ncs_to_p1_0_0_2" source="ncs_to_p1_0_0_2" target="p1_0_2"/>
+      <arc id="next_3-ncs_to_p1_0_0_2" source="ncs_to_p1_0_0_2" target="next_3"/>
+      <arc id="ncs_to_p1_0_1_0-ncs_0_1" source="ncs_0_1" target="ncs_to_p1_0_1_0"/>
+      <arc id="ncs_to_p1_0_1_0-next_0" source="next_0" target="ncs_to_p1_0_1_0"/>
+      <arc id="p1_0_0-ncs_to_p1_0_1_0" source="ncs_to_p1_0_1_0" target="p1_0_0"/>
+      <arc id="next_1-ncs_to_p1_0_1_0" source="ncs_to_p1_0_1_0" target="next_1"/>
+      <arc id="ncs_to_p1_0_1_1-ncs_0_1" source="ncs_0_1" target="ncs_to_p1_0_1_1"/>
+      <arc id="ncs_to_p1_0_1_1-next_1" source="next_1" target="ncs_to_p1_0_1_1"/>
+      <arc id="p1_0_1-ncs_to_p1_0_1_1" source="ncs_to_p1_0_1_1" target="p1_0_1"/>
+      <arc id="next_2-ncs_to_p1_0_1_1" source="ncs_to_p1_0_1_1" target="next_2"/>
+      <arc id="ncs_to_p1_0_1_2-ncs_0_1" source="ncs_0_1" target="ncs_to_p1_0_1_2"/>
+      <arc id="ncs_to_p1_0_1_2-next_2" source="next_2" target="ncs_to_p1_0_1_2"/>
+      <arc id="p1_0_2-ncs_to_p1_0_1_2" source="ncs_to_p1_0_1_2" target="p1_0_2"/>
+      <arc id="next_3-ncs_to_p1_0_1_2" source="ncs_to_p1_0_1_2" target="next_3"/>
+      <arc id="ncs_to_p1_1_0_0-ncs_1_0" source="ncs_1_0" target="ncs_to_p1_1_0_0"/>
+      <arc id="ncs_to_p1_1_0_0-next_0" source="next_0" target="ncs_to_p1_1_0_0"/>
+      <arc id="p1_1_0-ncs_to_p1_1_0_0" source="ncs_to_p1_1_0_0" target="p1_1_0"/>
+      <arc id="next_1-ncs_to_p1_1_0_0" source="ncs_to_p1_1_0_0" target="next_1"/>
+      <arc id="ncs_to_p1_1_0_1-ncs_1_0" source="ncs_1_0" target="ncs_to_p1_1_0_1"/>
+      <arc id="ncs_to_p1_1_0_1-next_1" source="next_1" target="ncs_to_p1_1_0_1"/>
+      <arc id="p1_1_1-ncs_to_p1_1_0_1" source="ncs_to_p1_1_0_1" target="p1_1_1"/>
+      <arc id="next_2-ncs_to_p1_1_0_1" source="ncs_to_p1_1_0_1" target="next_2"/>
+      <arc id="ncs_to_p1_1_0_2-ncs_1_0" source="ncs_1_0" target="ncs_to_p1_1_0_2"/>
+      <arc id="ncs_to_p1_1_0_2-next_2" source="next_2" target="ncs_to_p1_1_0_2"/>
+      <arc id="p1_1_2-ncs_to_p1_1_0_2" source="ncs_to_p1_1_0_2" target="p1_1_2"/>
+      <arc id="next_3-ncs_to_p1_1_0_2" source="ncs_to_p1_1_0_2" target="next_3"/>
+      <arc id="ncs_to_p1_1_1_0-ncs_1_1" source="ncs_1_1" target="ncs_to_p1_1_1_0"/>
+      <arc id="ncs_to_p1_1_1_0-next_0" source="next_0" target="ncs_to_p1_1_1_0"/>
+      <arc id="p1_1_0-ncs_to_p1_1_1_0" source="ncs_to_p1_1_1_0" target="p1_1_0"/>
+      <arc id="next_1-ncs_to_p1_1_1_0" source="ncs_to_p1_1_1_0" target="next_1"/>
+      <arc id="ncs_to_p1_1_1_1-ncs_1_1" source="ncs_1_1" target="ncs_to_p1_1_1_1"/>
+      <arc id="ncs_to_p1_1_1_1-next_1" source="next_1" target="ncs_to_p1_1_1_1"/>
+      <arc id="p1_1_1-ncs_to_p1_1_1_1" source="ncs_to_p1_1_1_1" target="p1_1_1"/>
+      <arc id="next_2-ncs_to_p1_1_1_1" source="ncs_to_p1_1_1_1" target="next_2"/>
+      <arc id="ncs_to_p1_1_1_2-ncs_1_1" source="ncs_1_1" target="ncs_to_p1_1_1_2"/>
+      <arc id="ncs_to_p1_1_1_2-next_2" source="next_2" target="ncs_to_p1_1_1_2"/>
+      <arc id="p1_1_2-ncs_to_p1_1_1_2" source="ncs_to_p1_1_1_2" target="p1_1_2"/>
+      <arc id="next_3-ncs_to_p1_1_1_2" source="ncs_to_p1_1_1_2" target="next_3"/>
+      <arc id="p1_to_p2_eq_0_2-p1_0_1" source="p1_0_1" target="p1_to_p2_eq_0_2"/>
+      <arc id="p1_to_p2_eq_0_2-next_2" source="next_2" target="p1_to_p2_eq_0_2"/>
+      <arc id="p2_0_1-p1_to_p2_eq_0_2" source="p1_to_p2_eq_0_2" target="p2_0_1"/>
+      <arc id="next_0-p1_to_p2_eq_0_2" source="p1_to_p2_eq_0_2" target="next_0"/>
+      <arc id="p1_to_p2_eq_0_3-p1_0_1" source="p1_0_1" target="p1_to_p2_eq_0_3"/>
+      <arc id="p1_to_p2_eq_0_3-next_3" source="next_3" target="p1_to_p2_eq_0_3"/>
+      <arc id="p2_0_1-p1_to_p2_eq_0_3" source="p1_to_p2_eq_0_3" target="p2_0_1"/>
+      <arc id="next_1-p1_to_p2_eq_0_3" source="p1_to_p2_eq_0_3" target="next_1"/>
+      <arc id="p1_to_p2_eq_1_2-p1_1_1" source="p1_1_1" target="p1_to_p2_eq_1_2"/>
+      <arc id="p1_to_p2_eq_1_2-next_2" source="next_2" target="p1_to_p2_eq_1_2"/>
+      <arc id="p2_1_1-p1_to_p2_eq_1_2" source="p1_to_p2_eq_1_2" target="p2_1_1"/>
+      <arc id="next_0-p1_to_p2_eq_1_2" source="p1_to_p2_eq_1_2" target="next_0"/>
+      <arc id="p1_to_p2_eq_1_3-p1_1_1" source="p1_1_1" target="p1_to_p2_eq_1_3"/>
+      <arc id="p1_to_p2_eq_1_3-next_3" source="next_3" target="p1_to_p2_eq_1_3"/>
+      <arc id="p2_1_1-p1_to_p2_eq_1_3" source="p1_to_p2_eq_1_3" target="p2_1_1"/>
+      <arc id="next_1-p1_to_p2_eq_1_3" source="p1_to_p2_eq_1_3" target="next_1"/>
+      <arc id="p1_to_p2_diff_0_0-p1_0_0" source="p1_0_0" target="p1_to_p2_diff_0_0"/>
+      <arc id="p2_0_0-p1_to_p2_diff_0_0" source="p1_to_p2_diff_0_0" target="p2_0_0"/>
+      <arc id="p1_to_p2_diff_0_2-p1_0_2" source="p1_0_2" target="p1_to_p2_diff_0_2"/>
+      <arc id="p2_0_0-p1_to_p2_diff_0_2" source="p1_to_p2_diff_0_2" target="p2_0_0"/>
+      <arc id="p1_to_p2_diff_1_0-p1_1_0" source="p1_1_0" target="p1_to_p2_diff_1_0"/>
+      <arc id="p2_1_0-p1_to_p2_diff_1_0" source="p1_to_p2_diff_1_0" target="p2_1_0"/>
+      <arc id="p1_to_p2_diff_1_2-p1_1_2" source="p1_1_2" target="p1_to_p2_diff_1_2"/>
+      <arc id="p2_1_0-p1_to_p2_diff_1_2" source="p1_to_p2_diff_1_2" target="p2_1_0"/>
+      <arc id="p2_to_p3_0_0_(True, False)-p2_0_0" source="p2_0_0" target="p2_to_p3_0_0_(True, False)"/>
+      <arc id="p2_to_p3_0_0_(True, False)-slot_(True, False)" source="slot_(True, False)" target="p2_to_p3_0_0_(True, False)"/>
+      <arc id="p3_0_0-p2_to_p3_0_0_(True, False)" source="p2_to_p3_0_0_(True, False)" target="p3_0_0"/>
+      <arc id="slot_(True, False)-p2_to_p3_0_0_(True, False)" source="p2_to_p3_0_0_(True, False)" target="slot_(True, False)"/>
+      <arc id="p2_to_p3_0_1_(False, True)-p2_0_1" source="p2_0_1" target="p2_to_p3_0_1_(False, True)"/>
+      <arc id="p2_to_p3_0_1_(False, True)-slot_(False, True)" source="slot_(False, True)" target="p2_to_p3_0_1_(False, True)"/>
+      <arc id="p3_0_1-p2_to_p3_0_1_(False, True)" source="p2_to_p3_0_1_(False, True)" target="p3_0_1"/>
+      <arc id="slot_(False, True)-p2_to_p3_0_1_(False, True)" source="p2_to_p3_0_1_(False, True)" target="slot_(False, True)"/>
+      <arc id="p2_to_p3_1_0_(True, False)-p2_1_0" source="p2_1_0" target="p2_to_p3_1_0_(True, False)"/>
+      <arc id="p2_to_p3_1_0_(True, False)-slot_(True, False)" source="slot_(True, False)" target="p2_to_p3_1_0_(True, False)"/>
+      <arc id="p3_1_0-p2_to_p3_1_0_(True, False)" source="p2_to_p3_1_0_(True, False)" target="p3_1_0"/>
+      <arc id="slot_(True, False)-p2_to_p3_1_0_(True, False)" source="p2_to_p3_1_0_(True, False)" target="slot_(True, False)"/>
+      <arc id="p2_to_p3_1_1_(False, True)-p2_1_1" source="p2_1_1" target="p2_to_p3_1_1_(False, True)"/>
+      <arc id="p2_to_p3_1_1_(False, True)-slot_(False, True)" source="slot_(False, True)" target="p2_to_p3_1_1_(False, True)"/>
+      <arc id="p3_1_1-p2_to_p3_1_1_(False, True)" source="p2_to_p3_1_1_(False, True)" target="p3_1_1"/>
+      <arc id="slot_(False, True)-p2_to_p3_1_1_(False, True)" source="p2_to_p3_1_1_(False, True)" target="slot_(False, True)"/>
+      <arc id="p3_to_cs_0_0_(True, False)-p3_0_0" source="p3_0_0" target="p3_to_cs_0_0_(True, False)"/>
+      <arc id="p3_to_cs_0_0_(True, False)-slot_(True, False)" source="slot_(True, False)" target="p3_to_cs_0_0_(True, False)"/>
+      <arc id="cs_0_0-p3_to_cs_0_0_(True, False)" source="p3_to_cs_0_0_(True, False)" target="cs_0_0"/>
+      <arc id="slot_(False, False)-p3_to_cs_0_0_(True, False)" source="p3_to_cs_0_0_(True, False)" target="slot_(False, False)"/>
+      <arc id="p3_to_cs_0_1_(False, True)-p3_0_1" source="p3_0_1" target="p3_to_cs_0_1_(False, True)"/>
+      <arc id="p3_to_cs_0_1_(False, True)-slot_(False, True)" source="slot_(False, True)" target="p3_to_cs_0_1_(False, True)"/>
+      <arc id="cs_0_1-p3_to_cs_0_1_(False, True)" source="p3_to_cs_0_1_(False, True)" target="cs_0_1"/>
+      <arc id="slot_(False, False)-p3_to_cs_0_1_(False, True)" source="p3_to_cs_0_1_(False, True)" target="slot_(False, False)"/>
+      <arc id="p3_to_cs_1_0_(True, False)-p3_1_0" source="p3_1_0" target="p3_to_cs_1_0_(True, False)"/>
+      <arc id="p3_to_cs_1_0_(True, False)-slot_(True, False)" source="slot_(True, False)" target="p3_to_cs_1_0_(True, False)"/>
+      <arc id="cs_1_0-p3_to_cs_1_0_(True, False)" source="p3_to_cs_1_0_(True, False)" target="cs_1_0"/>
+      <arc id="slot_(False, False)-p3_to_cs_1_0_(True, False)" source="p3_to_cs_1_0_(True, False)" target="slot_(False, False)"/>
+      <arc id="p3_to_cs_1_1_(False, True)-p3_1_1" source="p3_1_1" target="p3_to_cs_1_1_(False, True)"/>
+      <arc id="p3_to_cs_1_1_(False, True)-slot_(False, True)" source="slot_(False, True)" target="p3_to_cs_1_1_(False, True)"/>
+      <arc id="cs_1_1-p3_to_cs_1_1_(False, True)" source="p3_to_cs_1_1_(False, True)" target="cs_1_1"/>
+      <arc id="slot_(False, False)-p3_to_cs_1_1_(False, True)" source="p3_to_cs_1_1_(False, True)" target="slot_(False, False)"/>
+      <arc id="cs_to_ncs_0_0_(False, False)-cs_0_0" source="cs_0_0" target="cs_to_ncs_0_0_(False, False)"/>
+      <arc id="cs_to_ncs_0_0_(False, False)-slot_(False, False)" source="slot_(False, False)" target="cs_to_ncs_0_0_(False, False)"/>
+      <arc id="ncs_0_0-cs_to_ncs_0_0_(False, False)" source="cs_to_ncs_0_0_(False, False)" target="ncs_0_0"/>
+      <arc id="slot_(False, True)-cs_to_ncs_0_0_(False, False)" source="cs_to_ncs_0_0_(False, False)" target="slot_(False, True)"/>
+      <arc id="cs_to_ncs_0_1_(False, False)-cs_0_1" source="cs_0_1" target="cs_to_ncs_0_1_(False, False)"/>
+      <arc id="cs_to_ncs_0_1_(False, False)-slot_(False, False)" source="slot_(False, False)" target="cs_to_ncs_0_1_(False, False)"/>
+      <arc id="ncs_0_1-cs_to_ncs_0_1_(False, False)" source="cs_to_ncs_0_1_(False, False)" target="ncs_0_1"/>
+      <arc id="slot_(True, False)-cs_to_ncs_0_1_(False, False)" source="cs_to_ncs_0_1_(False, False)" target="slot_(True, False)"/>
+      <arc id="cs_to_ncs_1_0_(False, False)-cs_1_0" source="cs_1_0" target="cs_to_ncs_1_0_(False, False)"/>
+      <arc id="cs_to_ncs_1_0_(False, False)-slot_(False, False)" source="slot_(False, False)" target="cs_to_ncs_1_0_(False, False)"/>
+      <arc id="ncs_1_0-cs_to_ncs_1_0_(False, False)" source="cs_to_ncs_1_0_(False, False)" target="ncs_1_0"/>
+      <arc id="slot_(False, True)-cs_to_ncs_1_0_(False, False)" source="cs_to_ncs_1_0_(False, False)" target="slot_(False, True)"/>
+      <arc id="cs_to_ncs_1_1_(False, False)-cs_1_1" source="cs_1_1" target="cs_to_ncs_1_1_(False, False)"/>
+      <arc id="cs_to_ncs_1_1_(False, False)-slot_(False, False)" source="slot_(False, False)" target="cs_to_ncs_1_1_(False, False)"/>
+      <arc id="ncs_1_1-cs_to_ncs_1_1_(False, False)" source="cs_to_ncs_1_1_(False, False)" target="ncs_1_1"/>
+      <arc id="slot_(True, False)-cs_to_ncs_1_1_(False, False)" source="cs_to_ncs_1_1_(False, False)" target="slot_(True, False)"/>
+    </page>
+  </net>
+</pnml>

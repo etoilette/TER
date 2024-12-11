@@ -1,0 +1,345 @@
+<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
+  <net id="example_10.pnml" type="http://ifnml.process-security.de/grammar/v1.0/ptnet">
+    <page id="top-level">
+      <place id="p0">
+        <name>
+          <text>p0</text>
+          <graphics>
+            <offset x="1.0" y="30.0"/>
+            <fill color="transparent" gradient-color="none"/>
+            <line color="transparent" shape="line" style="solid" width="1.0"/>
+            <font align="center" family="Dialog" rotation="0.0" size="11" style="normal" weight="normal"/>
+          </graphics>
+          <toolspecific tool="de.uni-freiburg.telematik.editor" version="1.0">
+            <visible>true</visible>
+          </toolspecific>
+        </name>
+        <graphics>
+          <dimension x="45.0" y="45.0"/>
+          <position x="198.0" y="203.0"/>
+          <fill color="#B6CAE4" gradient-color="none"/>
+          <line color="#000000" shape="line" style="solid" width="1.0"/>
+        </graphics>
+        <initialMarking>
+          <text>1</text>
+        </initialMarking>
+      </place>
+      <place id="p1">
+        <name>
+          <text>p1</text>
+          <graphics>
+            <offset x="1.0" y="30.0"/>
+            <fill color="transparent" gradient-color="none"/>
+            <line color="transparent" shape="line" style="solid" width="1.0"/>
+            <font align="center" family="Dialog" rotation="0.0" size="11" style="normal" weight="normal"/>
+          </graphics>
+          <toolspecific tool="de.uni-freiburg.telematik.editor" version="1.0">
+            <visible>true</visible>
+          </toolspecific>
+        </name>
+        <graphics>
+          <dimension x="45.0" y="45.0"/>
+          <position x="201.0" y="396.0"/>
+          <fill color="#B6CAE4" gradient-color="none"/>
+          <line color="#000000" shape="line" style="solid" width="1.0"/>
+        </graphics>
+      </place>
+      <place id="p2">
+        <name>
+          <text>p2</text>
+          <graphics>
+            <offset x="1.0" y="30.0"/>
+            <fill color="transparent" gradient-color="none"/>
+            <line color="transparent" shape="line" style="solid" width="1.0"/>
+            <font align="center" family="Dialog" rotation="0.0" size="11" style="normal" weight="normal"/>
+          </graphics>
+          <toolspecific tool="de.uni-freiburg.telematik.editor" version="1.0">
+            <visible>true</visible>
+          </toolspecific>
+        </name>
+        <graphics>
+          <dimension x="45.0" y="45.0"/>
+          <position x="431.0" y="211.0"/>
+          <fill color="#B6CAE4" gradient-color="none"/>
+          <line color="#000000" shape="line" style="solid" width="1.0"/>
+        </graphics>
+        <initialMarking>
+          <text>1</text>
+        </initialMarking>
+      </place>
+      <place id="p3">
+        <name>
+          <text>p3</text>
+          <graphics>
+            <offset x="1.0" y="30.0"/>
+            <fill color="transparent" gradient-color="none"/>
+            <line color="transparent" shape="line" style="solid" width="1.0"/>
+            <font align="center" family="Dialog" rotation="0.0" size="11" style="normal" weight="normal"/>
+          </graphics>
+          <toolspecific tool="de.uni-freiburg.telematik.editor" version="1.0">
+            <visible>true</visible>
+          </toolspecific>
+        </name>
+        <graphics>
+          <dimension x="45.0" y="45.0"/>
+          <position x="434.0" y="389.0"/>
+          <fill color="#B6CAE4" gradient-color="none"/>
+          <line color="#000000" shape="line" style="solid" width="1.0"/>
+        </graphics>
+      </place>
+      <place id="p4">
+        <name>
+          <text>p4</text>
+          <graphics>
+            <offset x="1.0" y="30.0"/>
+            <fill color="transparent" gradient-color="none"/>
+            <line color="transparent" shape="line" style="solid" width="1.0"/>
+            <font align="center" family="Dialog" rotation="0.0" size="11" style="normal" weight="normal"/>
+          </graphics>
+          <toolspecific tool="de.uni-freiburg.telematik.editor" version="1.0">
+            <visible>true</visible>
+          </toolspecific>
+        </name>
+        <graphics>
+          <dimension x="45.0" y="45.0"/>
+          <position x="318.0" y="293.0"/>
+          <fill color="#B6CAE4" gradient-color="none"/>
+          <line color="#000000" shape="line" style="solid" width="1.0"/>
+        </graphics>
+        <initialMarking>
+          <text>1</text>
+        </initialMarking>
+      </place>
+      <place id="p5">
+        <name>
+          <text>p5</text>
+          <graphics>
+            <offset x="1.0" y="30.0"/>
+            <fill color="transparent" gradient-color="none"/>
+            <line color="transparent" shape="line" style="solid" width="1.0"/>
+            <font align="center" family="Dialog" rotation="0.0" size="11" style="normal" weight="normal"/>
+          </graphics>
+          <toolspecific tool="de.uni-freiburg.telematik.editor" version="1.0">
+            <visible>true</visible>
+          </toolspecific>
+        </name>
+        <graphics>
+          <dimension x="45.0" y="45.0"/>
+          <position x="315.0" y="118.0"/>
+          <fill color="#B6CAE4" gradient-color="none"/>
+          <line color="#000000" shape="line" style="solid" width="1.0"/>
+        </graphics>
+        <initialMarking>
+          <text>1</text>
+        </initialMarking>
+      </place>
+      <transition id="a">
+        <name>
+          <text>a</text>
+          <graphics>
+            <offset x="1.0" y="30.0"/>
+            <fill color="transparent" gradient-color="none"/>
+            <line color="transparent" shape="line" style="solid" width="1.0"/>
+            <font align="center" family="Dialog" rotation="0.0" size="11" style="normal" weight="normal"/>
+          </graphics>
+          <toolspecific tool="de.uni-freiburg.telematik.editor" version="1.0">
+            <visible>true</visible>
+          </toolspecific>
+        </name>
+        <graphics>
+          <dimension x="45.0" y="45.0"/>
+          <position x="198.0" y="298.0"/>
+          <fill color="#B6CAE4" gradient-color="none"/>
+          <line color="#000000" shape="line" style="solid" width="1.0"/>
+        </graphics>
+        <silent>false</silent>
+      </transition>
+      <transition id="b">
+        <name>
+          <text>b</text>
+          <graphics>
+            <offset x="1.0" y="30.0"/>
+            <fill color="transparent" gradient-color="none"/>
+            <line color="transparent" shape="line" style="solid" width="1.0"/>
+            <font align="center" family="Dialog" rotation="0.0" size="11" style="normal" weight="normal"/>
+          </graphics>
+          <toolspecific tool="de.uni-freiburg.telematik.editor" version="1.0">
+            <visible>true</visible>
+          </toolspecific>
+        </name>
+        <graphics>
+          <dimension x="45.0" y="45.0"/>
+          <position x="431.0" y="291.0"/>
+          <fill color="#B6CAE4" gradient-color="none"/>
+          <line color="#000000" shape="line" style="solid" width="1.0"/>
+        </graphics>
+        <silent>false</silent>
+      </transition>
+      <transition id="c">
+        <name>
+          <text>c</text>
+          <graphics>
+            <offset x="1.0" y="30.0"/>
+            <fill color="transparent" gradient-color="none"/>
+            <line color="transparent" shape="line" style="solid" width="1.0"/>
+            <font align="center" family="Dialog" rotation="0.0" size="11" style="normal" weight="normal"/>
+          </graphics>
+          <toolspecific tool="de.uni-freiburg.telematik.editor" version="1.0">
+            <visible>true</visible>
+          </toolspecific>
+        </name>
+        <graphics>
+          <dimension x="45.0" y="45.0"/>
+          <position x="313.0" y="206.0"/>
+          <fill color="#B6CAE4" gradient-color="none"/>
+          <line color="#000000" shape="line" style="solid" width="1.0"/>
+        </graphics>
+        <silent>false</silent>
+      </transition>
+      <arc id="arcTP_cp4" source="c" target="p4">
+        <graphics>
+          <line color="#000000" shape="line" style="solid" width="1.0"/>
+        </graphics>
+        <inscription>
+          <text>1</text>
+          <graphics>
+            <offset x="1.0" y="30.0"/>
+            <fill color="transparent" gradient-color="none"/>
+            <line color="transparent" shape="line" style="solid" width="1.0"/>
+            <font align="center" family="Dialog" rotation="0.0" size="11" style="normal" weight="normal"/>
+          </graphics>
+        </inscription>
+      </arc>
+      <arc id="arcPT_p5c" source="p5" target="c">
+        <graphics>
+          <line color="#000000" shape="line" style="solid" width="1.0"/>
+        </graphics>
+        <inscription>
+          <text>1</text>
+          <graphics>
+            <offset x="1.0" y="30.0"/>
+            <fill color="transparent" gradient-color="none"/>
+            <line color="transparent" shape="line" style="solid" width="1.0"/>
+            <font align="center" family="Dialog" rotation="0.0" size="11" style="normal" weight="normal"/>
+          </graphics>
+        </inscription>
+      </arc>
+      <arc id="arcPT_p0a" source="p0" target="a">
+        <graphics>
+          <line color="#000000" shape="line" style="solid" width="1.0"/>
+        </graphics>
+        <inscription>
+          <text>1</text>
+          <graphics>
+            <offset x="1.0" y="30.0"/>
+            <fill color="transparent" gradient-color="none"/>
+            <line color="transparent" shape="line" style="solid" width="1.0"/>
+            <font align="center" family="Dialog" rotation="0.0" size="11" style="normal" weight="normal"/>
+          </graphics>
+        </inscription>
+      </arc>
+      <arc id="arcPT_p4b" source="p4" target="b">
+        <graphics>
+          <line color="#000000" shape="line" style="solid" width="1.0"/>
+          <position x="373.0" y="273.0"/>
+        </graphics>
+        <inscription>
+          <text>1</text>
+          <graphics>
+            <offset x="-6.0" y="-2.0"/>
+            <fill color="transparent" gradient-color="none"/>
+            <line color="transparent" shape="line" style="solid" width="1.0"/>
+            <font align="center" family="Dialog" rotation="0.0" size="11" style="normal" weight="normal"/>
+          </graphics>
+        </inscription>
+      </arc>
+      <arc id="arcPT_p4a" source="p4" target="a">
+        <graphics>
+          <line color="#000000" shape="line" style="solid" width="1.0"/>
+          <position x="258.0" y="273.0"/>
+        </graphics>
+        <inscription>
+          <text>1</text>
+          <graphics>
+            <offset x="-7.0" y="-2.0"/>
+            <fill color="transparent" gradient-color="none"/>
+            <line color="transparent" shape="line" style="solid" width="1.0"/>
+            <font align="center" family="Dialog" rotation="0.0" size="11" style="normal" weight="normal"/>
+          </graphics>
+        </inscription>
+      </arc>
+      <arc id="arcTP_ap1" source="a" target="p1">
+        <graphics>
+          <line color="#000000" shape="line" style="solid" width="1.0"/>
+        </graphics>
+        <inscription>
+          <text>1</text>
+          <graphics>
+            <offset x="1.0" y="30.0"/>
+            <fill color="transparent" gradient-color="none"/>
+            <line color="transparent" shape="line" style="solid" width="1.0"/>
+            <font align="center" family="Dialog" rotation="0.0" size="11" style="normal" weight="normal"/>
+          </graphics>
+        </inscription>
+      </arc>
+      <arc id="arcPT_p2b" source="p2" target="b">
+        <graphics>
+          <line color="#000000" shape="line" style="solid" width="1.0"/>
+        </graphics>
+        <inscription>
+          <text>1</text>
+          <graphics>
+            <offset x="1.0" y="30.0"/>
+            <fill color="transparent" gradient-color="none"/>
+            <line color="transparent" shape="line" style="solid" width="1.0"/>
+            <font align="center" family="Dialog" rotation="0.0" size="11" style="normal" weight="normal"/>
+          </graphics>
+        </inscription>
+      </arc>
+      <arc id="arcTP_bp3" source="b" target="p3">
+        <graphics>
+          <line color="#000000" shape="line" style="solid" width="1.0"/>
+        </graphics>
+        <inscription>
+          <text>1</text>
+          <graphics>
+            <offset x="1.0" y="30.0"/>
+            <fill color="transparent" gradient-color="none"/>
+            <line color="transparent" shape="line" style="solid" width="1.0"/>
+            <font align="center" family="Dialog" rotation="0.0" size="11" style="normal" weight="normal"/>
+          </graphics>
+        </inscription>
+      </arc>
+      <arc id="arcTP_ap4" source="a" target="p4">
+        <graphics>
+          <line color="#000000" shape="line" style="solid" width="1.0"/>
+          <position x="258.0" y="313.0"/>
+        </graphics>
+        <inscription>
+          <text>1</text>
+          <graphics>
+            <offset x="-7.0" y="2.0"/>
+            <fill color="transparent" gradient-color="none"/>
+            <line color="transparent" shape="line" style="solid" width="1.0"/>
+            <font align="center" family="Dialog" rotation="0.0" size="11" style="normal" weight="normal"/>
+          </graphics>
+        </inscription>
+      </arc>
+      <arc id="arcTP_bp4" source="b" target="p4">
+        <graphics>
+          <line color="#000000" shape="line" style="solid" width="1.0"/>
+          <position x="373.0" y="308.0"/>
+        </graphics>
+        <inscription>
+          <text>1</text>
+          <graphics>
+            <offset x="-7.0" y="2.0"/>
+            <fill color="transparent" gradient-color="none"/>
+            <line color="transparent" shape="line" style="solid" width="1.0"/>
+            <font align="center" family="Dialog" rotation="0.0" size="11" style="normal" weight="normal"/>
+          </graphics>
+        </inscription>
+      </arc>
+    </page>
+  </net>
+</pnml>
