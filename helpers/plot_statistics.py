@@ -4,13 +4,27 @@ import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib import cm
 import pandas
+from typing import List
 
-def myplot(csv: str):
+def myplot(csv: str, prefixes: List[str], bw:bool, showMax:bool, cMapName:str, diffMarker:str):
     x = pandas.read_csv(csv)
 
-    N = x.shape[0] - 1
+    if prefixes:
+        N = len(prefixes)
+    else:
+        N = x.shape[0] - 1
 
-    colors = [cm.jet(c) for c in np.linspace(0, 1, N)]
+    if bw:
+        colors = N*["k"]
+    else:
+        colors = eval(f"[cm.{cMapName}(c) for c in np.linspace(0, 1, N)]")
+
+    shapes = N * [".-"]
+    if diffMarker:
+        shapes = ["o-", "^-", "v-", "*-", "s-", "P-"]
+
+    seen_pref = set()
+
     ff,aa = plt.subplots(1,1)
     for idx, l in enumerate(x.iterrows()):
         d = np.array(eval(l[1]["L(dim;ncell)"].replace(";", ","))).T
@@ -20,8 +34,35 @@ def myplot(csv: str):
             name = l[1]["name"]
         except:
             pass
-        aa.plot(d[0,:], d[1,:], ".-", markersize=10, color=colors[idx%len(colors)], label=name + " All Cells")
-        aa.plot(red[0,:], red[1,:], "*", markersize=10, color=colors[idx%len(colors)], label=name + " Max Cells")
+
+        label = ""
+        fIdx = idx
+        if prefixes:
+            LL = [name.startswith(x) for x in prefixes]
+            try:
+                fIdx = LL.index(True)
+            except ValueError:
+                print(f"The instance {name} was not matched by a prefix in {prefixes} - skipped")
+                continue
+            if prefixes[fIdx] not in seen_pref:
+                label = prefixes[fIdx]
+                seen_pref.add(prefixes[fIdx])
+        else:
+            label = name
+
+        shape = shapes[fIdx % len(colors)]
+        mSize = 12 if "." in "shape" else 7
+        if label:
+            aa.plot(d[0,:], d[1,:], shape, markersize=mSize, color=colors[fIdx%len(colors)],
+                    label=label + (" All Cells" if showMax else ""))
+            if showMax:
+                aa.plot(red[0,:], red[1,:], "*", markersize=10, color=colors[fIdx%len(colors)],
+                        label=label + " Max Cells")
+        else:
+            aa.plot(d[0, :], d[1, :], shapes[fIdx % len(colors)], markersize=mSize, color=colors[fIdx % len(colors)])
+            if showMax:
+                aa.plot(red[0, :], red[1, :], "*", markersize=10, color=colors[fIdx % len(colors)],)
+
 
     aa.legend()
     aa.grid("on")
@@ -55,6 +96,13 @@ ap.add_argument("--csv", type=str, default="./examples/res.csv",
 ap.add_argument("--runstats", action="store_true",
                 help="If set, computes the examples first, otherwise reuses the existing csv file.")
 ap.add_argument("--instances", type=str, default="pnml_files/mcc/")
+ap.add_argument("--shortLegend", type=str, default="",
+                help="Comma separated list of prefixes of instance families.")
+ap.add_argument("--bw", action="store_true", help="Set color to black and white")
+ap.add_argument("--showMax", action="store_true", help="Also plot the maxcells")
+ap.add_argument("--cMap", type=str, default="jet", help="Which color palette to use. "
+                                                        "Ignored when --bw is set.")
+ap.add_argument("--diffMarker", action="store_true", help="Use different markers per instance.")
 
 if __name__ == "__main__":
     args = ap.parse_args()
@@ -71,4 +119,8 @@ if __name__ == "__main__":
                 subprocess.check_call(f"""awk 'NR % 2 == 0' {tcsv.name} >> {tcsv2.name}""", shell=True)
                 subprocess.call(f"""paste -d "," {tnames.name} {tcsv2.name} > {args.csv}""", shell=True)
 
-    myplot(args.csv)
+    myplot(args.csv,
+           [x.replace(" ", "") for x in args.shortLegend.split(",")] if args.shortLegend else [],
+           args.bw, args.showMax,
+           args.cMap,
+           args.diffMarker)
