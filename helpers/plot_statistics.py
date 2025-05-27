@@ -58,10 +58,12 @@ def myplot(csv: str, prefixes: List[str], bw:bool, showMax:bool, cMapName:str, d
             if showMax:
                 aa.plot(red[0,:], red[1,:], "*", markersize=10, color=colors[fIdx%len(colors)],
                         label=label + " Max Cells")
+                print(f"{name}: Num cells: {sum(d[1,:])}, Num max-cells: {sum(red[1,:])}, reduction: {(1-sum(red[1,:])/sum(d[1,:]))*100}")
         else:
             aa.plot(d[0, :], d[1, :], shapes[fIdx % len(colors)], markersize=mSize, color=colors[fIdx % len(colors)])
             if showMax:
                 aa.plot(red[0, :], red[1, :], "*", markersize=10, color=colors[fIdx % len(colors)],)
+                print(f"{name}: Num cells: {sum(d[1,:])}, Num max-cells: {sum(red[1,:])}, reduction: {(1-sum(red[1,:])/sum(d[1,:]))*100}")
 
 
     aa.legend()
