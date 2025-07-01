@@ -1,4 +1,5 @@
 #pragma once
+#pragma once
 
 #include <algorithm>
 #include <concepts>
@@ -7,6 +8,8 @@
 #include <set>
 #include <sstream>
 #include <vector>
+#include <ranges>
+#include <numeric>
 
 #include "pn.h"
 
@@ -37,8 +40,9 @@ namespace pnhda
 
     /**
      *Dimension of a cell / conclist
+     * -> Should have a size method
      */
-    uint get_dim(const conc_t& conc) const noexcept { return conc.size(); }
+    //uint get_dim(const conc_t& conc) const noexcept { return conc.size(); }
   };
 
   /**
@@ -74,6 +78,7 @@ namespace pnhda
     using markingid_t = PNHDAT::markingid_t;
     using config_t = PNHDAT::config_t;
     using fm_t = PNHDAT::fm_t;
+    //using get_dim = PNHDAT::get_dim;
     /** @} */
 
   protected:
@@ -283,6 +288,8 @@ namespace pnhda
         stack.back().idx_term_ = 0;
         stack.back().idx_term_end_ = stack.back().c_.size();
         id_one(stack.back());
+        // Set it as initial
+        init_set_.insert(stack.back().cid_);
       }
 
       while (!stack.empty())
@@ -314,8 +321,13 @@ namespace pnhda
     {
       auto ss = std::ostringstream();
 
-      ss << X_ext_.size() << ',' << square_ess_.size() << ',' << mark_ess_.size() << ',' << delta_0_.size() << ','
-         << delta_1_.size() << ',';
+      ss << X_ext_.size() << ',' << square_ess_.size() << ',' << mark_ess_.size() << ','
+      << (std::accumulate(delta_0_.begin(), delta_0_.end(), (size_t)0,
+        [](auto lhs, const auto& ev)
+          {return lhs + ev.second.size(); })) << ','
+      << (std::accumulate(delta_1_.begin(), delta_1_.end(), (size_t)0,
+        [](auto lhs, const auto& ev)
+          {return lhs + ev.second.size(); })) << ',';
 
       // dimension of cell and how many
       auto celldet = std::map<uint, uint>();
@@ -324,7 +336,7 @@ namespace pnhda
       {
         concid_t cid = conf.second;
         const auto& concl = square_ess_.at(cid);
-        uint dim = PNHDAT::get_dim(concl);
+        uint dim = concl.size(); //PNHDAT::get_dim(concl);
 
         auto it = celldet.try_emplace(dim, 0).first;
         ++(it->second);
@@ -373,7 +385,7 @@ namespace pnhda
          << "ranksep=0.35; // Reverting back to standard\n"
          << rnodes;
 
-
+      // Dummy for initial node
       for (const auto& p : X_ext_.get_rev())
       {
         auto ns = "N" + std::to_string(p.first);

@@ -21,3 +21,6 @@ include_directories("include")
 
 add_executable(pn2HDA pn2HDA.cpp)
 target_link_libraries(pn2HDA PRIVATE ${symmetri_LIBRARIES})
+
+add_executable(pn2MAXHDA pn2MAXHDA.cpp)
+target_link_libraries(pn2MAXHDA PRIVATE ${symmetri_LIBRARIES})
