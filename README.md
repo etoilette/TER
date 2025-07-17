@@ -1,3 +1,8 @@
+# Update:
+
+We are currently cleaning up the code.
+It will be available from 20/07 on at the latest.
+
 # pn2HDA
 
 pn2HDA is a tool to convert different types of Petri Nets into (partial) Higher Dimensional Automata.
