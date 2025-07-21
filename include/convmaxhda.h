@@ -765,9 +765,7 @@ private:
       auto ss = std::ostringstream();
 
       ss << X_ext_.size() << ',' << square_ess_.size() << ',' << mark_ess_.size() << ','
-         << (std::accumulate(edges_.begin(), edges_.end(), (size_t)0,
-             [](auto lhs, const auto& ev)
-             {return lhs + ev.second.size(); })) << ',';
+         << accu_size_sec(edges_) << ',';
 
       // dimension of cell and how many
       auto celldet = std::map<uint, uint>();
