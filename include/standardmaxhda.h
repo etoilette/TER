@@ -3,12 +3,14 @@
 #pragma once
 
 #include <algorithm>
+#include <deque>
 #include <functional>
 #include <iterator>
 #include <memory>
 #include <optional>
 #include <ranges>
 #include <set>
+#include <stack>
 #include <unordered_set>
 #include <vector>
 #include <z3++.h>
@@ -16,7 +18,7 @@
 #include "pnhda.h"
 #include "utils.h"
 
-namespace naivemaxhda
+namespace standardmaxhda
 {
   /**
    * Standard definition of a max-HDA derived from a Petri Net
@@ -329,7 +331,8 @@ namespace naivemaxhda
     {
       auto ss = std::ostringstream();
 
-      ss << X_ext_.size() << ',' << square_ess_.size() << ',' << mark_ess_.size() << ',' << next_.size() << ',';
+      ss << X_ext_.size() << ',' << square_ess_.size() << ',' << mark_ess_.size() << ','
+         << accu_size_sec(next_) << ',';
 
       // dimension of cell and how many
       auto celldet = std::map<uint, uint>();
@@ -507,13 +510,15 @@ namespace naivemaxhda
     {
       switch (version)
       {
-      case 1: return convert_me_1_(pn);
-      case 2: return convert_me_2_(pn);
+      case 0: return convert_me_1_<stack_t>(pn);  // dfs
+      case 1: return convert_me_1_<queue_t>(pn);  // bfs
+      case 2: return convert_me_2_<check_wait_t<true>>(pn);
+      case 3: return convert_me_2_<check_wait_t<false>>(pn);
       default: throw std::runtime_error("unknown version");
       }
     }
 
-    // Definition of additional structures
+    // Definition of additional structures for the main alg
     struct cell_iterator_t
     {
       marking_t m;
@@ -524,6 +529,90 @@ namespace naivemaxhda
         return l.m < r.m;
       }
     };
+
+    struct stack_t
+    {
+      std::vector<cell_iterator_t> s_;
+
+      template<class... ARGS>
+      auto push(ARGS&&... args)
+      {
+        return s_.emplace_back(std::forward<ARGS>(args)...);
+      }
+      auto pop()
+      {
+        auto r = std::move(s_.back());
+        s_.pop_back();
+        return r;
+      }
+      [[nodiscard]] bool empty() const noexcept
+      {
+        return s_.empty();
+      }
+    };
+    struct queue_t
+    {
+      std::deque<cell_iterator_t> q_;
+
+      template<class... ARGS>
+      auto push(ARGS&&... args)
+      {
+        return q_.emplace_back(std::forward<ARGS>(args)...);
+      }
+      auto pop()
+      {
+        auto r = std::move(q_.front());
+        q_.pop_front();
+        return r;
+      }
+      [[nodiscard]] bool empty() const noexcept
+      {
+        return q_.empty();
+      }
+    };
+    template<bool isStack>
+    struct check_wait_t
+    {
+      using c_set_t = std::set<cell_iterator_t, decltype(cell_iterator_t::cmp)*>;
+      using se_t = c_set_t::iterator;
+      c_set_t cw_ = c_set_t(&cell_iterator_t::cmp);
+      std::deque<se_t> sw_;
+
+      template<class... ARGS>
+      auto push(ARGS&&... args)
+      {
+        auto p = cw_.emplace(std::  forward<ARGS>(args)...);
+        if (p.second)
+          sw_.push_back(p.first);
+        return p;
+      }
+      auto pop()
+      {
+        if constexpr (isStack)
+        {
+          auto r = std::move(*sw_.back());
+          cw_.erase(sw_.back());
+          sw_.pop_back();
+          return r;
+        }
+        else
+        {
+          auto r = std::move(*sw_.front());
+          cw_.erase(sw_.front());
+          sw_.pop_front();
+          return r;
+        }
+      }
+      [[nodiscard]] bool count(const cell_iterator_t& l) const
+      {
+        return cw_.count(l);
+      }
+      [[nodiscard]] bool empty() const noexcept
+      {
+        return sw_.empty();
+      }
+    };
+
 
     struct opt_context_t
     {
@@ -704,8 +793,11 @@ namespace naivemaxhda
     }; // todo seperate precheck, heuristics and solver construction
 
 
+    template<class BUFFER>
     void convert_me_1_(const pn::standard_pn_t& pn)
     {
+
+      auto buffer = BUFFER();
       /**
        * Check if (m,c) is a subcell of (mp,cp)
        */
@@ -716,29 +808,13 @@ namespace naivemaxhda
           return is_subcell_impl_(m, c, mp, cp, opt_context, pn);
         };
 
-
-      auto stack = std::vector<cell_iterator_t>();
-
-      auto push = [&](auto&& m, cid_t p)
-        {
-          //std::cerr << "push " << join(m) << "; " << p << std::endl;
-          stack.emplace_back(std::forward<decltype(m)>(m), p);
-        };
-      auto pop = [&]()
-        {
-          auto r = std::move(stack.back());
-          //std::cerr << "poph " << join(r.m) << "; " << r.parent << std::endl;
-          stack.pop_back();
-          return r;
-        };
-
-      push(pn.init_marking(), count);
+      buffer.push(pn.init_marking(), count);
 
       // Main alg
       auto subpairs = std::vector<std::pair<cid_t, cid_t>>();
-      while (!stack.empty())
+      while (!buffer.empty())
       {
-        auto [nm, pid] = pop();
+        auto [nm, pid] = buffer.pop();
 
         auto all_MCS = gen_max_conc_step(pn, nm);
         for (const auto& amcs : all_MCS)
@@ -772,16 +848,18 @@ namespace naivemaxhda
 
           // Push all corner markings
           auto it = transition_iterator(amcs);
-          while (it.next()) // First is first no trans
-            push(it.fire(nm, pn), nc);
+          while (it.next()) // First is no trans
+            buffer.push(it.fire(nm, pn), nc);
         }
       }
       clean_me_(); // Remove temp markings and conclists
     }
 
 
+    template<class BUFFER>
     void convert_me_2_(const pn::standard_pn_t& pn)
     {
+      auto buffer = BUFFER();
       /**
        * Check if (m,c) is a subcell of (mp,cp)
        */
@@ -802,33 +880,13 @@ namespace naivemaxhda
             return is_subcell_(m, conc_t(), mp, cp);
           };
 
-      auto stack = std::set<cell_iterator_t, decltype(cell_iterator_t::cmp)*>(&cell_iterator_t::cmp);
-
-      auto try_push = [&](auto&& m, cid_t p) -> auto
-        {
-          //std::cerr << "push " << join(m) << "; " << p << std::endl;
-          return stack.emplace(std::forward<decltype(m)>(m), p);
-        };
-      auto try_push_c = [&](auto&& c) -> auto
-        {
-          //std::cerr << "push " << join(m) << "; " << p << std::endl;
-          return stack.emplace(std::forward<decltype(c)>(c));
-        };
-      auto pop = [&]()
-        {
-          auto it = stack.begin();
-          auto r = std::move(*it);
-          stack.erase(it);
-          return r;
-        };
-
-      try_push(pn.init_marking(), count);
+      buffer.push(pn.init_marking(), count);
 
       // Main alg
       auto subpairs = std::vector<std::pair<cid_t, cid_t>>();
-      while (!stack.empty())
+      while (!buffer.empty())
       {
-        auto [nm, pid] = pop();
+        auto [nm, pid] = buffer.pop();
 
         auto all_MCS = gen_max_conc_step(pn, nm);
         for (const auto& amcs : all_MCS)
@@ -862,10 +920,10 @@ namespace naivemaxhda
 
           // Push all corner markings
           auto it = transition_iterator(amcs);
-          while (it.next()) // First is first no trans
+          while (it.next()) // First is no trans
           {
             auto next_cell_it = cell_iterator_t(it.fire(nm, pn), nc);
-            if (stack.count(next_cell_it) == 0)
+            if (buffer.count(next_cell_it) == 0)
             {
               // Only use if not generated
               //try_push_c(std::move(next_cell_it));
@@ -877,7 +935,7 @@ namespace naivemaxhda
                            && is_generated_(next_cell_it.m,
                                         mark_ess_.at(p.first.first), square_ess_.at(p.first.second));
                   }))
-                  try_push_c(std::move(next_cell_it));
+                  buffer.push(std::move(next_cell_it));
             }
           }
         }

@@ -6,6 +6,7 @@
 #include "convmaxhda.h"
 #include "pn.h"
 #include "pnhda.h"
+#include "standardmaxhda.h"
 
 template <class MAXHDA>
 void
@@ -30,16 +31,25 @@ int main(int argc, char *argv[])
   if (argc == 2 && (strcmp(argv[1], "-h") || strcmp(argv[1], "--help")))
   {
     std::cout << "pnhda type file act\n"
-              << "Translate the given pnml of type\n"
-                 "\"standard\": Standard PT net\n"
-                 "\"weighted\": Weighted PT net.\n"
+              << "This tool provides different strategies to "
+                 "obtain maxHDAs from pnml files. Finally different post-processes "
+                 "can be choosen.\n"
+                 "\"standardConv\": Standard PT net converted to detailed max HDA\n"
+                 "\"standardmaxhda_dfs\": Direct translation to maxHDA, "
+                 "first algo, dfs\n"
+                 "\"standardmaxhda_bfs\": Direct translation to maxHDA, "
+                 "first algo, bfs\n"
+                 "\"standardmaxhda2_dfs\": Direct translation to maxHDA, "
+                 "second algo, dfs\n"
+                 "\"standardmaxhda2_bfs\": Direct translation to maxHDA, "
+                 "second algo, bfs\n"
                  "file is the path to the pnml file\n"
                  "and finally act describes what to do:\n"
                  "\"str\": Generate a text-based representation of the maxHDA\n"
                  "\"dot\": Generate the dot file for the corresponding "
                  "ST-automaton\n"
-                 "Note that we currently first translate the net into an explicit "
-                 "HDA, then reduce it.";
+                 "\"csv\": Produces standard csv data\n"
+                 "\"csv_header\": Produces standard csv header and data";
     return 0;
   }
   if (argc != 4)
@@ -63,6 +73,30 @@ int main(int argc, char *argv[])
     auto spnhda = pnhda::weighted_pn_hda(spn);
     auto maxhda = convmaxhda::weighted_max_conv_hda(spnhda);
     act(maxhda, argv[3]);
+  }
+  else if (type_s == "standardmaxhda_dfs")
+  {
+    auto spn = pn::standard_pn_t(n, m);
+    auto spnmaxhda = standardmaxhda::standard_pn_maxhda(std::make_pair(&spn, 0));
+    act(spnmaxhda, argv[3]);
+  }
+  else if (type_s == "standardmaxhda_bfs")
+  {
+    auto spn = pn::standard_pn_t(n, m);
+    auto spnmaxhda = standardmaxhda::standard_pn_maxhda(std::make_pair(&spn, 1));
+    act(spnmaxhda, argv[3]);
+  }
+  else if (type_s == "standardmaxhda2_dfs")
+  {
+    auto spn = pn::standard_pn_t(n, m);
+    auto spnmaxhda = standardmaxhda::standard_pn_maxhda(std::make_pair(&spn, 2));
+    act(spnmaxhda, argv[3]);
+  }
+  else if (type_s == "standardmaxhda2_bfs")
+  {
+    auto spn = pn::standard_pn_t(n, m);
+    auto spnmaxhda = standardmaxhda::standard_pn_maxhda(std::make_pair(&spn, 3));
+    act(spnmaxhda, argv[3]);
   }
   else
     throw std::invalid_argument("unknown type: " + type_s);
