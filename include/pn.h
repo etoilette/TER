@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "bimap.h"
+#include "utils.h"
 
 #include <symmetri/types.h>
 
@@ -43,6 +44,11 @@ namespace pn
     using place2id_t = bimap<pnames_t, pnamesid_t, short_lex, std::less<pnamesid_t>>; /** Bimap for identifaction */
     using trans2id_t = bimap<tnames_t, tnamesid_t, short_lex, std::less<pnamesid_t>>; /** Bimap for identifaction */
   };
+  inline std::ostream& operator<<(std::ostream& os, const invar_pn_types::place_set_t& ps)
+  {
+    os << join(ps, ",");
+    return os;
+  }
 
 
   /**
@@ -56,6 +62,13 @@ namespace pn
     using all_trans_t = std::map<tnamesid_t, transition_t>; /** All the
     transitions in a PN */
   };
+  inline std::ostream&
+  operator<<(std::ostream& os, const basic_pn_types::transition_t& tt)
+  {
+    os << '[' << tt.first << "],[" << tt.second << ']';
+    return os;
+  }
+
 
   /**
    * Types invariant for weighted petri net with inhibitor arcs
@@ -66,6 +79,13 @@ namespace pn
     using weighted_place_set_t = std::vector<weighted_place_t>; /** A set of weighted places;
     Vector is sorted with respect to the places */
   };
+  inline std::ostream&
+  operator<<(std::ostream& os, const invar_weighted_pn_types::weighted_place_set_t& wps)
+  {
+    for (const auto& wp : wps)
+      os << '(' << wp.first << ',' << wp.second << "),";
+    return os;
+  }
 
   /**
    * Types for weighted petri nets
@@ -78,6 +98,13 @@ namespace pn
     using all_trans_t = std::map<tnamesid_t, transition_t>; /** Type to store all
     the transitions in a WPN */
   };
+
+  inline std::ostream&
+  operator<<(std::ostream& os, const weighted_pn_types::transition_t& tt)
+  {
+    os << '[' << tt.first << "],[" << tt.second << ']';
+    return os;
+  }
 
   /**
    * Types for weighted petri nets with inhibitor arcs
@@ -95,6 +122,12 @@ namespace pn
     static constexpr uint inhib_value = 999u; /** Not many passers / tools
     support inhibitor arcs, so we choose a special value to designate them */
   };
+  inline std::ostream&
+  operator<<(std::ostream& os, const weighted_pni_types::transition_t& tt)
+  {
+    os << "[[" << tt.first.first << "],[" << tt.first.second << "]],[" << tt.second << ']';
+    return os;
+  }
 
 
   /**
@@ -103,7 +136,7 @@ namespace pn
    * @tparam TSM Function defining how to initiate firing
    * @tparam TM Function defining how to terminate firing
    */
-  template <class PNT, class TSM, class TM>
+  template <class PNT, class TSM, class TM, int TYPE = -1>
   class basic_pn
   {
   public:
@@ -117,6 +150,8 @@ namespace pn
 
     using place2id_t = PNT::place2id_t;
     using trans2id_t = PNT::trans2id_t;
+
+    static constexpr int type = TYPE;
 
   protected:
     place2id_t place2id_; /** bidirectional map between places and their id */
@@ -206,6 +241,19 @@ namespace pn
     }
     bool try_fire(const tnames_t& t, marking_t& m) { return try_fire(trans2id_.at(t), m); }
     /** @} */
+
+    friend std::ostream& operator<<(std::ostream& os, const basic_pn& pn)
+    {
+      os << "PetriNetType: " << pn.type << '\n';
+      os << "NumPlaces: " << pn.init_m_.size() << '\n';
+      os << "NumTransitions: " << pn.all_trans_.size() << '\n';
+      os << "InitMark: [" << join(pn.init_m_, ",") << "]\n";
+      os << "<Transitions>\n";
+      for (const auto& [tidx, tt] : pn.all_trans_)
+        os << '(' << tidx << ",\"" << pn.trans2id().at(tidx) << "\"): " << tt << '\n';
+      os << "</Transitions>\n";
+      return os;
+    }
   };
 
   // Concrete implementation of starting and terminating functions
@@ -263,9 +311,9 @@ namespace pn
    * Neither weighted nor inhibited, derives from a suitable parametrised basic_pn class
    */
   class standard_pn_t
-      : public basic_pn<basic_pn_types, decltype(try_start_me_standard), decltype(terminate_me_standard)>
+      : public basic_pn<basic_pn_types, decltype(try_start_me_standard), decltype(terminate_me_standard), 0>
   {
-    using bpn = basic_pn<basic_pn_types, decltype(try_start_me_standard), decltype(terminate_me_standard)>;
+    using bpn = basic_pn<basic_pn_types, decltype(try_start_me_standard), decltype(terminate_me_standard), 0>;
 
   public:
     using place_set_t = basic_pn_types::place_set_t;
@@ -324,6 +372,7 @@ namespace pn
         }
       }
     }
+
   };
 
   // Implementations for weighted PN
@@ -400,9 +449,9 @@ namespace pn
    * Weighted but not inhibited, derives from a suitable parametrised basic_pn class
    */
   class weighted_pn_t
-      : public basic_pn<weighted_pn_types, decltype(try_start_me_weighted), decltype(terminate_me_weighted)>
+      : public basic_pn<weighted_pn_types, decltype(try_start_me_weighted), decltype(terminate_me_weighted), 1>
   {
-    using wpn = basic_pn<weighted_pn_types, decltype(try_start_me_weighted), decltype(terminate_me_weighted)>;
+    using wpn = basic_pn<weighted_pn_types, decltype(try_start_me_weighted), decltype(terminate_me_weighted), 1>;
 
   public:
     using weighted_place_t = weighted_pn_types::weighted_place_t;
@@ -513,10 +562,10 @@ namespace pn
   * Neither weighted nor inhibited, derives from a suitable parametrised basic_pn class
   */
   class weighted_pni_t : public basic_pn<weighted_pni_types, decltype(try_start_me_weighted_inhib),
-                                         decltype(terminate_me_weighted_inhib)>
+                                         decltype(terminate_me_weighted_inhib), 2>
   {
     using wpni =
-      basic_pn<weighted_pni_types, decltype(try_start_me_weighted_inhib), decltype(terminate_me_weighted_inhib)>;
+      basic_pn<weighted_pni_types, decltype(try_start_me_weighted_inhib), decltype(terminate_me_weighted_inhib), 2>;
 
   public:
     using place_set_t = weighted_pni_types::place_set_t;

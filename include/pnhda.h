@@ -543,18 +543,61 @@ namespace pnhda
      */
     std::string format(const std::string& opt) const
     {
+      if (opt.starts_with("str_max"))
+      {
+
+        auto all_max_cells = get_max_cells();
+
+        auto clist2cset = [](const conc_t& c)
+          {
+            std::map<tnamesid_t, size_t> cset; // trans Id / Multiplicity
+
+            for (const auto& t: c)
+              if (!cset.contains(t))
+                cset.emplace_hint(cset.end(), t, std::count(c.cbegin(), c.cend(), t));
+            return cset;
+          };
+
+        auto ss = std::ostringstream();
+
+        ss << "NumMaxCells: " << all_max_cells.size() << '\n';
+        ss << "Transitions: ";
+        for (const auto& [t_name, t_id] : trans2id_.get_fwd())
+          ss << '(' << t_id << ",\"" << t_name << "\"),";
+        ss << '\n';
+        ss << "<Cells>\n";
+        for (auto cidx : all_max_cells)
+        {
+          const auto& cf = X_ext().at(cidx);
+          const auto& mark = mark_ess().at(cf.first);
+          const auto& conc = square_ess().at(cf.second);
+          auto cset = clist2cset(conc);
+
+          ss << cidx << ": [";
+          for (auto m : mark)
+            ss << m << ',';
+          ss << "] x [";
+          for (const auto& [t_id, mult] : cset)
+            ss << '(' << t_id << ", " << mult << "),";
+          ss << "]\n";
+        }
+
+        ss << "</Cells>\n";
+
+        return ss.str();
+      }
       if (opt.starts_with("str"))
       {
         auto ss = std::ostringstream();
         ss << *this;
         return ss.str();
       }
-      else if (opt.starts_with("dot"))
+      if (opt.starts_with("dot"))
       {
         return to_dot_(opt.substr(3));
       }
-      else
-        throw std::invalid_argument("unknown option: " + opt);
+
+      throw std::invalid_argument("unknown option: " + opt);
     }
 
     friend std::ostream& operator<<(std::ostream& os, const basic_pn_hda& spnhda)
@@ -609,6 +652,24 @@ namespace pnhda
         }
       }
       return os;
+    }
+
+    auto get_max_cells() const
+    {
+      // Take all cells, remove all cells that are the lower or upper face of some other
+      auto all_cells = std::vector<bool>(X_ext().get_fwd().size(), true);
+      for (const auto& t : delta_0())
+        for (const auto& tt : t.second)
+          all_cells[tt.second] = false;
+      for (const auto& t : delta_1())
+        for (const auto& tt : t.second)
+          all_cells[tt.second] = false;
+
+      auto r = std::vector<cid_t>();
+      for (cid_t i = 0; i < (cid_t) all_cells.size(); ++i)
+        if (all_cells[i])
+          r.push_back(i);
+      return r;
     }
 
   }; // basic_pn_hda

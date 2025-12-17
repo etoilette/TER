@@ -10,7 +10,7 @@ template<class PNHDA>
 void
 act(PNHDA& pnhda, const std::string& act)
 {
-  const auto print_act = std::set<std::string>{"str", "dot"};
+  const auto print_act = std::set<std::string>{"str", "str_max", "dot"};
 
   auto get_avg_occ = [](const auto& pnhda)
     {
@@ -19,7 +19,7 @@ act(PNHDA& pnhda, const std::string& act)
       auto nS = pnhda.mark_ess().get_fwd().begin()->first.size();
       auto res = std::vector<double>(nBins, 0); // Last bin is for size
 
-      auto toBin = [&nBins, &nS, nsD = (double) nS](size_t count)
+      auto toBin = [nBins, &nS, nsD = (double) nS](size_t count)
         {
           count -= (count == nS);
           return (std::size_t) std::floor(((double) count / nsD) * nBins);
@@ -45,21 +45,12 @@ act(PNHDA& pnhda, const std::string& act)
 
   auto count_max_cell = [](const auto& pnhda)
     {
-      // Take all cells, remove all cells that are the lower or upper face of some other
-      auto all_cells = std::vector<bool>(pnhda.X_ext().get_fwd().size(), true);
-      for (const auto& t : pnhda.delta_0())
-        for (const auto& tt : t.second)
-          all_cells[tt.second] = false;
-      for (const auto& t : pnhda.delta_1())
-        for (const auto& tt : t.second)
-          all_cells[tt.second] = false;
+      auto all_max_cells = pnhda.get_max_cells();
 
       // Dimension to occurrence
       auto cell_count = std::map<unsigned, unsigned>{};
-      for (unsigned idx = 0; idx < all_cells.size(); ++idx)
+      for (auto idx : all_max_cells)
       {
-        if (!all_cells[idx])
-          continue;
         const auto& cf = pnhda.X_ext().at(idx);
         const auto& conc = pnhda.square_ess().at(cf.second);
         cell_count[conc.size()] += 1;
@@ -102,7 +93,9 @@ int main(int argc, char *argv[])
                  "with a special weight, 999 by default\n"
                  "file is the path to the pnml file\n"
                  "and finally act describes what to do:\n"
+                 "\"base\": Output basic informations of the Petri Net\n"
                  "\"str\": Generate a text-based representation of the HDA\n"
+                 "\"str_max\": Generate a text-based representation of the maximal representation of the HDA\n"
                  "\"dot\": Generate the dot file for the corresponding ST-automaton\n";
     return 0;
   }
@@ -113,27 +106,45 @@ int main(int argc, char *argv[])
   auto [n, m] = symmetri::readPnml({std::string(argv[2])});
 
   auto type_s = std::string(argv[1]);
+  auto act_s = std::string(argv[3]);
 
   if (type_s == "standard")
   {
     auto spn = pn::standard_pn_t(n, m);
-    auto spnhda = pnhda::standard_pn_hda(spn);
-    act(spnhda, argv[3]);
+    if (act_s == "base")
+      std::cout << spn << std::endl;
+    else
+    {
+      auto spnhda = pnhda::standard_pn_hda(spn);
+      act(spnhda, argv[3]);
+    }
+    return 0;
   }
-  else if (type_s == "weighted")
+  if (type_s == "weighted")
   {
     auto spn = pn::weighted_pn_t(n, m);
-    auto spnhda = pnhda::weighted_pn_hda(spn);
-    act(spnhda, argv[3]);
+    if (act_s == "base")
+      std::cout << spn << std::endl;
+    else
+    {
+      auto spnhda = pnhda::weighted_pn_hda(spn);
+      act(spnhda, argv[3]);
+    }
+    return 0;
   }
-  else if (type_s == "wpni")
+  if (type_s == "wpni")
   {
     auto spn = pn::weighted_pni_t(n, m);
-    auto spnhda = pnhda::weighted_pni_hda(spn);
-    act(spnhda, argv[3]);
-  }
-  else
-    throw std::invalid_argument("unknown type: " + type_s);
 
-  return 0;
+    if (act_s == "base")
+      std::cout << spn << std::endl;
+    else
+    {
+      auto spnhda = pnhda::weighted_pni_hda(spn);
+      act(spnhda, argv[3]);
+    }
+    return 0;
+  }
+
+  throw std::invalid_argument("unknown type: " + type_s);
 }

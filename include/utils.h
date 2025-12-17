@@ -2,6 +2,7 @@
 
 #include <sstream>
 #include <ranges>
+#include <numeric>
 
 template <class CONT>
 std::string join(const CONT& c, const std::string& sep = ",")
