@@ -1,7 +1,7 @@
 # Description:
 hda2csg is a function that maps a couple (hda, pn), where hda is the maxcell representation of the higher-dimensional automaton (HDA) for the Petri-net (PN) pn, to the corresponding concurrent step graph (CSG) of the HDA.
 ## Dependencies:
-Require the module spot () and argparse.
+Require the module spot (https://spot.lre.epita.fr/index.html) and argparse.
 ## Usage:
 Run python3.12 hda2csg.py hda_file pn_file
 With hda_file containing the text describing the HDA and pn_file the text describing the PN.

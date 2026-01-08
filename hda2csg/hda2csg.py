@@ -9,11 +9,21 @@ NumPlaces: 5
 NumTransitions: 4
 InitMark: [2,2,0,0,0]
 <Transitions>
-(0,"a"): [0],[2]
-(1,"b"): [1],[3]
-(2,"c"): [2,3],[4]
-(3,"x"): [0,1],[2,3]
-</Transitions>"""
+(0,"a"): [0],[2]|(i1;)
+(1,"b"): [1],[3]|(;o2)
+(2,"c"): [2,3],[4]|(i2;o1 & -o2)
+(3,"x"): [0,1],[2,3]|(;)
+</Transitions>
+<Place-Output>
+0:(o3)
+1:(-o4 & o2)
+</Place-Output>"""
+
+def get_io_name(strg):
+    if strg[0] == '!':
+        return strg[1:]
+    else:
+        return strg
 
 def parse_petri_net(pn_text):
     lines = pn_text.split("\n")
@@ -27,6 +37,8 @@ def parse_petri_net(pn_text):
     pn = dict()
     pn["Map"] = dict()
     pn["Transitions"] = dict()
+    pn["Inputs"] = set()
+    pn["Outputs"] = set()
     for transition_text in transitions_text:
         parts = transition_text.split(": ")
         name_texts = parts[0].split(",")
@@ -34,11 +46,36 @@ def parse_petri_net(pn_text):
         name = name_texts[1][1:-2]
         pn["Map"][id] = name
         pn["Transitions"][name] = dict()
-        defs = parts[1].split("],[")
-        preplaces = [int(i) for i in defs[0][1:].split(",")]
-        postplaces = [int(i) for i in defs[1][:-1].split(",")]
+        defs = parts[1].split("|")
+        defs_places = defs[0].split("],[")
+        preplaces = [int(i) for i in defs_places[0][1:].split(",")]
+        postplaces = [int(i) for i in defs_places[1][:-1].split(",")]
         pn["Transitions"][name]["pre"] = preplaces
         pn["Transitions"][name]["post"] = postplaces
+        defs_io = defs[1][1:-1].split(";")
+        inputs = defs_io[0]
+        outputs = defs_io[1]
+        inputs_names = [get_io_name(e) for e in inputs.split(" & ") if e != '']
+        outputs_names = [get_io_name(e) for e in outputs.split(" & ") if e != '']
+        pn["Transitions"][name]["inputs"] = inputs
+        pn["Transitions"][name]["outputs"] = outputs
+        pn["Inputs"].update(inputs_names)
+        pn["Outputs"].update(outputs_names)
+    
+    pn["PlaceIO"] = dict()
+    while lines[i] != "<Place-Output>":
+        i += 1
+    i0 = i +1
+    while lines[i] != "</Place-Output>":
+        i += 1
+    if i > i0 +1:
+        place_out_text = lines[i0:i]
+        for placeio_text in place_out_text:
+            placeio = placeio_text.split(':')
+            outputs = placeio[1][1:-1]
+            pn["PlaceIO"][int(placeio[0])] = outputs
+            outputs_names = [get_io_name(e) for e in outputs.split(" & ") if e != '']
+            pn["Outputs"].update(outputs_names)
     return pn
 
 hda_text = """4 : [0,0,0,0,0] x [a,a,b,b]
@@ -262,70 +299,130 @@ def compute_markings_avoidable(marking, transitions_dict, pn):
                 resu.append(compute_marking_maxcell_transi(marking, transitions, pn))
     return resu
 
-def add_transition(csg, pn, marking_source, mset, states, p1):
+def get_literal(strg, ap):
+    if strg[0] == "!":
+        return buddy.bdd_not(ap[strg[1:]])
+    else:
+        return ap[strg]
+
+def remove_space(strg):
+    resu = ""
+    for char in strg:
+        if char !=' ':
+            resu = resu + char
+    return resu
+
+def get_string_bdd(strg, ap):
+    print(strg)
+    clauses = remove_space(strg).split('&')
+    resu = buddy.bddtrue
+    for clause in clauses:
+        literals = clause.split('|')
+        resu_clause = buddy.bddfalse
+        for literal in literals:
+            resu_clause = resu_clause | get_literal(literal, ap)
+        resu = resu & resu_clause
+    return resu
+
+def get_marking_output(marking, pn, ap):
+    resu = buddy.bddtrue
+    print(f"getting outputs for {marking} :")
+    for state in range(len(marking)):
+        if state in pn["PlaceIO"].keys() and marking[state] > 0:
+            print(f"getting bdd for state {state}: {pn["PlaceIO"][state]}")
+            resu = resu & get_string_bdd(pn["PlaceIO"][state], ap)
+    return resu
+
+def get_state(marking, states, csg, pn, ap):
+    if marking in states:
+        state = states[marking]
+    else:
+        formula = get_marking_output(marking, pn, ap)
+        if formula is None:
+            state = csg.new_state()
+        else:
+            state = csg.new_state()
+        states[marking] = state
+    return state
+
+def get_io(marking_source, mset, pn, ap):
+    resu = get_marking_output(marking_source, pn, ap)
+    for t in mset.keys():
+        inputs = pn["Transitions"][t]["inputs"]
+        outputs = pn["Transitions"][t]["outputs"]
+        print(f"In mset: {mset}, inputs: \"{inputs}\" and outputs: \"{outputs}\"")
+        if inputs:
+            resu = resu & get_string_bdd(inputs, ap)
+        if outputs:
+            resu = resu & get_string_bdd(outputs, ap)
+    return resu
+
+def add_transition(csg, pn, ap, edges_labels, marking_source, mset, states):
     marking_target = compute_marking_transi(marking_source, mset, pn)
-    """if mark ing_source in states:
-        state_source = states[marking_source]
-    else:
-        state_source = csg.new_state()
-        states[marking_source] = state_source
-        print(f"new state {state_source} for source {marking_source}") """
-    state_source = states[marking_source]
-    if marking_target in states:
-        state_target = states[marking_target]
-    else:
-        state_target = csg.new_state()
-        states[marking_target] = state_target
-        print(f"new state {state_target} for {marking_target}")
-    if not any(e.dst == state_target for e in csg.out(state_source)):
-        csg.new_edge(state_source, state_target, p1)
-    print(f"added edge from {marking_source} (state {state_source}) to {marking_target} (state {state_target}) by {mset}")
+    state_source = get_state(marking_source, states, csg, pn, ap)
+    state_target = get_state(marking_target, states, csg, pn, ap)
+    label = get_io(marking_source, mset, pn, ap)
+    if not (marking_source, marking_target) in edges_labels.keys():
+        edge = csg.new_edge(state_source, state_target, label)
+        edges_labels[(marking_source, marking_target)] = [label]
+        print(f"added new edge from {marking_source} (state {state_source}) to {marking_target} (state {state_target}) by {mset}")
+    elif not any(existing_label == label for existing_label in edges_labels[(marking_source, marking_target)]):
+        edge = csg.new_edge(state_source, state_target, label)
+        edges_labels[(marking_source, marking_target)].append(label)
+        print(f"added extra edge from {marking_source} (state {state_source}) to {marking_target} (state {state_target}) by {mset}")
     return marking_target
 
-def add_many_transitions(csg, pn, marking_source, concset, states, markings_avoidable, p1):
-    print(f"-> computing transitions from {marking_source}x{concset}")
-    if marking_source in states:
-        state = states[marking_source]
-    else:
-        state = csg.new_state()
-        states[marking_source] = state
-        print(f"new state {state} for source {marking_source}")
+def add_many_transitions(csg, pn, ap, edges_labels, marking_source, concset, states, markings_avoidable):
+    #print(f"-> computing transitions from {marking_source}x{concset}")
+    # get_state(marking_source, states, csg, pn, ap)
     set_keys = set(concset.keys())
     for mset in sub_multi_set(concset, set_keys):
         if len(mset) != 0:
-            marking_target = add_transition(csg, pn, marking_source, mset, states, p1)
+            marking_target = add_transition(csg, pn, ap, edges_labels, marking_source, mset, states)
             concset_comp = compute_comp_mset(mset, concset)
-            print(f"- finding {mset} to go from {marking_source} to {marking_target} with {concset_comp} remaining to do")
-            print(f"=== Avoiding consets {markings_avoidable}")
+            #print(f"- finding {mset} to go from {marking_source} to {marking_target} with {concset_comp} remaining to do")
+            #print(f"=== Avoiding consets {markings_avoidable}")
             if not marking_target in markings_avoidable:
                 markings_avoidable.append(marking_target)
-                print(f"adding {mset} to avoidable concsets")
-                print(f"=== Now avoiding consets {markings_avoidable}")
-                add_many_transitions(csg, pn, marking_target, concset_comp, states, markings_avoidable, p1)
-                print(f"-< finishing computing transitions from {marking_target}x{concset_comp}")
-                print(f"-> returning to computing transitions from {marking_source}x{concset}")
+                #print(f"adding {mset} to avoidable concsets")
+                #print(f"=== Now avoiding consets {markings_avoidable}")
+                add_many_transitions(csg, pn, ap, edges_labels, marking_target, concset_comp, states, markings_avoidable)
+                #print(f"-< finishing computing transitions from {marking_target}x{concset_comp}")
+                #print(f"-> returning to computing transitions from {marking_source}x{concset}")
     return 1
 
 """ This function takes an HDA in MAXCELL form that represents the petri net pn in inputs and produces its concurentstep graph associated"""
 def hdatocsg (hda, pn) :
     bdict = spot.make_bdd_dict()
     csg = spot.make_twa_graph(bdict)
-    p1 = buddy.bdd_ithvar(csg.register_ap("p1"))
+    #csg = spot.make_twa_graph()
+    #bdict = csg.get_dict()
+
+    ap = dict()
+    for ap_in in pn["Inputs"]:
+        ap_var = buddy.bdd_ithvar(csg.register_ap(ap_in))
+        ap[ap_in] = ap_var
+    #bdd_outputs = spot.formula.ff()
+    for ap_out in pn["Outputs"]:
+        ap_var = buddy.bdd_ithvar(csg.register_ap(ap_out))
+        ap[ap_out] = ap_var
+        spot.set_synthesis_outputs(csg, ap_var)
 
     #states keeps track of the association marking <=> states of the automatons
     states = dict()
+
+    edges_labels = dict()
 
     for maxcell in hda.keys() :
         concset = hda[maxcell]["Concset"]
         marking = compute_marking_pre(hda[maxcell]["Marking"], concset , pn)
         print(f"-- New MAXCELL {marking}x{concset}")
         markings_avoidable = compute_markings_avoidable(marking, hda[maxcell]["Transitions"], pn)
-        add_many_transitions(csg, pn, marking, concset, states, markings_avoidable, p1)
+        add_many_transitions(csg, pn, ap, edges_labels, marking, concset, states, markings_avoidable)
     return csg
 
 
 if __name__ == "__main__" :
-    # Utiliser ARGPARSE pour les argumments !
     parser = argparse.ArgumentParser()
     parser.add_argument("hda_file")
     parser.add_argument("pn_file")
@@ -338,7 +435,3 @@ if __name__ == "__main__" :
         print(hda)
         csg = hdatocsg(hda, pn)
         print(csg.to_str('hoa'))
-    # mset = {"a" : 2, "b" : 2}
-    # keys = set(mset.keys())
-    # for submset in sub_multi_set(mset, keys):
-    #     print(submset)
