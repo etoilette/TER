@@ -2,6 +2,12 @@ import spot
 import buddy
 import argparse
 
+class my_twa:
+    def __init__(self, aut, map):
+        self.twa = aut
+        self.states_label = map
+    
+
 # Parsing of input
 
 pn_text = """PetriNetType: 0
@@ -333,16 +339,14 @@ def get_marking_output(marking, pn, ap):
             resu = resu & get_string_bdd(pn["PlaceIO"][state], ap)
     return resu
 
-def get_state(marking, states, csg, pn, ap):
+def get_state(marking, states, csg, pn, ap, states_label):
     if marking in states:
         state = states[marking]
     else:
-        formula = get_marking_output(marking, pn, ap)
-        if formula is None:
-            state = csg.new_state()
-        else:
-            state = csg.new_state()
+        label = get_marking_output(marking, pn, ap)
+        state = csg.new_state()
         states[marking] = state
+        states_label[state] = label
     return state
 
 def get_io(marking_source, mset, pn, ap):
@@ -357,10 +361,10 @@ def get_io(marking_source, mset, pn, ap):
             resu = resu & get_string_bdd(outputs, ap)
     return resu
 
-def add_transition(csg, pn, ap, edges_labels, marking_source, mset, states):
+def add_transition(csg, pn, ap, states_label, edges_labels, marking_source, mset, states):
     marking_target = compute_marking_transi(marking_source, mset, pn)
-    state_source = get_state(marking_source, states, csg, pn, ap)
-    state_target = get_state(marking_target, states, csg, pn, ap)
+    state_source = get_state(marking_source, states, csg, pn, ap, states_label)
+    state_target = get_state(marking_target, states, csg, pn, ap, states_label)
     label = get_io(marking_source, mset, pn, ap)
     if not (marking_source, marking_target) in edges_labels.keys():
         edge = csg.new_edge(state_source, state_target, label)
@@ -372,13 +376,13 @@ def add_transition(csg, pn, ap, edges_labels, marking_source, mset, states):
         print(f"added extra edge from {marking_source} (state {state_source}) to {marking_target} (state {state_target}) by {mset}")
     return marking_target
 
-def add_many_transitions(csg, pn, ap, edges_labels, marking_source, concset, states, markings_avoidable):
+def add_many_transitions(csg, pn, ap, states_label, edges_labels, marking_source, concset, states, markings_avoidable):
     #print(f"-> computing transitions from {marking_source}x{concset}")
     # get_state(marking_source, states, csg, pn, ap)
     set_keys = set(concset.keys())
     for mset in sub_multi_set(concset, set_keys):
         if len(mset) != 0:
-            marking_target = add_transition(csg, pn, ap, edges_labels, marking_source, mset, states)
+            marking_target = add_transition(csg, pn, ap, states_label, edges_labels, marking_source, mset, states)
             concset_comp = compute_comp_mset(mset, concset)
             #print(f"- finding {mset} to go from {marking_source} to {marking_target} with {concset_comp} remaining to do")
             #print(f"=== Avoiding consets {markings_avoidable}")
@@ -386,7 +390,7 @@ def add_many_transitions(csg, pn, ap, edges_labels, marking_source, concset, sta
                 markings_avoidable.append(marking_target)
                 #print(f"adding {mset} to avoidable concsets")
                 #print(f"=== Now avoiding consets {markings_avoidable}")
-                add_many_transitions(csg, pn, ap, edges_labels, marking_target, concset_comp, states, markings_avoidable)
+                add_many_transitions(csg, pn, ap, states_label, edges_labels, marking_target, concset_comp, states, markings_avoidable)
                 #print(f"-< finishing computing transitions from {marking_target}x{concset_comp}")
                 #print(f"-> returning to computing transitions from {marking_source}x{concset}")
     return 1
@@ -412,14 +416,15 @@ def hdatocsg (hda, pn) :
     states = dict()
 
     edges_labels = dict()
+    states_label = dict()
 
     for maxcell in hda.keys() :
         concset = hda[maxcell]["Concset"]
         marking = compute_marking_pre(hda[maxcell]["Marking"], concset , pn)
         print(f"-- New MAXCELL {marking}x{concset}")
         markings_avoidable = compute_markings_avoidable(marking, hda[maxcell]["Transitions"], pn)
-        add_many_transitions(csg, pn, ap, edges_labels, marking, concset, states, markings_avoidable)
-    return csg
+        add_many_transitions(csg, pn, ap, states_label, edges_labels, marking, concset, states, markings_avoidable)
+    return my_twa(csg, states_label)
 
 
 if __name__ == "__main__" :
@@ -434,4 +439,5 @@ if __name__ == "__main__" :
         hda = parse_maxcell_hda(hda_file.read(), pn)
         print(hda)
         csg = hdatocsg(hda, pn)
-        print(csg.to_str('hoa'))
+        print(csg.states_label)
+        print(csg.twa.to_str('hoa'))
