@@ -6,6 +6,10 @@ class my_twa:
     def __init__(self, aut, map):
         self.twa = aut
         self.states_label = map
+        self.current_state = aut.get_init_state()
+    
+    def step(inputs):
+        return
     
 
 # Parsing of input
@@ -32,19 +36,22 @@ def get_io_name(strg):
         return strg
 
 def parse_petri_net(pn_text):
+    pn = dict()
+    pn["Map"] = dict()
+    pn["Transitions"] = dict()
+    pn["Inputs"] = set()
+    pn["Outputs"] = set()
     lines = pn_text.split("\n")
+
     i=0
     while lines[i] != "<Transitions>":
         i += 1
     i0 = i +1
     while lines[i] != "</Transitions>":
         i += 1
+    init_marking = tuple([int(m) for m in ((lines[i0-2]).split(": ")[1][1:-1]).split(',')])
+    pn["Initial"] = init_marking
     transitions_text = lines[i0:i]
-    pn = dict()
-    pn["Map"] = dict()
-    pn["Transitions"] = dict()
-    pn["Inputs"] = set()
-    pn["Outputs"] = set()
     for transition_text in transitions_text:
         parts = transition_text.split(": ")
         name_texts = parts[0].split(",")
@@ -349,6 +356,14 @@ def get_state(marking, states, csg, pn, ap, states_label):
         states_label[state] = label
     return state
 
+class Inputs_Error (Exception):
+    pass
+
+class Outputs_Error (Exception):
+    def __init__(self, message):            
+        # Call the base class constructor with the parameters it needs
+        super().__init__(message)
+
 def get_io(marking_source, mset, pn, ap):
     resu = get_marking_output(marking_source, pn, ap)
     for t in mset.keys():
@@ -356,8 +371,15 @@ def get_io(marking_source, mset, pn, ap):
         outputs = pn["Transitions"][t]["outputs"]
         print(f"In mset: {mset}, inputs: \"{inputs}\" and outputs: \"{outputs}\"")
         if inputs:
-            resu = resu & get_string_bdd(inputs, ap)
+            bdd_inputs = get_string_bdd(inputs, ap)
+            resu = resu & bdd_inputs
+            if resu == buddy.bddfalse:
+                raise Inputs_Error
         if outputs:
+            bdd_outputs = get_string_bdd(outputs, ap)
+            resu = resu & bdd_outputs
+            if resu == buddy.bddfalse:
+                raise Outputs_Error(f"Incompatible outputs in {marking_source} when firing {mset}")
             resu = resu & get_string_bdd(outputs, ap)
     return resu
 
@@ -365,7 +387,10 @@ def add_transition(csg, pn, ap, states_label, edges_labels, marking_source, mset
     marking_target = compute_marking_transi(marking_source, mset, pn)
     state_source = get_state(marking_source, states, csg, pn, ap, states_label)
     state_target = get_state(marking_target, states, csg, pn, ap, states_label)
-    label = get_io(marking_source, mset, pn, ap)
+    try:
+        label = get_io(marking_source, mset, pn, ap)
+    except Inputs_Error:
+        return marking_target
     if not (marking_source, marking_target) in edges_labels.keys():
         edge = csg.new_edge(state_source, state_target, label)
         edges_labels[(marking_source, marking_target)] = [label]
@@ -401,7 +426,6 @@ def hdatocsg (hda, pn) :
     csg = spot.make_twa_graph(bdict)
     #csg = spot.make_twa_graph()
     #bdict = csg.get_dict()
-
     ap = dict()
     for ap_in in pn["Inputs"]:
         ap_var = buddy.bdd_ithvar(csg.register_ap(ap_in))
@@ -418,6 +442,8 @@ def hdatocsg (hda, pn) :
     edges_labels = dict()
     states_label = dict()
 
+    initial_state = get_state(pn["Initial"], states, csg, pn, ap, states_label)
+    csg.set_init_state(initial_state)
     for maxcell in hda.keys() :
         concset = hda[maxcell]["Concset"]
         marking = compute_marking_pre(hda[maxcell]["Marking"], concset , pn)
