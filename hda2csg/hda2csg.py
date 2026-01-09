@@ -3,14 +3,61 @@ import buddy
 import argparse
 
 class my_twa:
-    def __init__(self, aut, map):
+    def __init__(self, aut, states_labels, outputs):
         self.twa = aut
-        self.states_label = map
-        self.current_state = aut.get_init_state()
+        self.outputs = outputs
+        self.states_labels = states_labels
+        self.current_state = 0
     
-    def step(inputs):
-        return
-    
+    def step(self, inputs):
+        #print(f" Moving with {inputs}")
+        for edge in self.twa.out(self.current_state):
+            #print(f"tries to go to {edge.dst}")
+            if satisfies_bdd(inputs, edge.cond, self.outputs):
+                self.current_state = edge.dst
+                #print(f"Found an edge to {edge.dst}")
+                return compute_outputs(self.twa, edge.cond, self.outputs)
+        #print("found no edge")
+        return compute_outputs(self.twa, self.states_labels[self.current_state], self.outputs)
+
+def satisfies_bdd (valuation, bdd, outputs):
+    if bdd == buddy.bddfalse:
+        return False
+    if bdd == buddy.bddtrue:
+        return True
+    top = buddy.bdd_var(bdd)
+    low = buddy.bdd_low(bdd)
+    high = buddy.bdd_high(bdd)
+    if top in outputs:
+        return satisfies_bdd(valuation, low, outputs) or satisfies_bdd(valuation, high, outputs)
+    if valuation[top]:
+        return satisfies_bdd(valuation, high, outputs)
+    else:
+        return satisfies_bdd(valuation, low, outputs)
+
+def get_output_name(var, outputs):
+    for name_out, var_out in outputs.items():
+        if var_out == var:
+            return name_out
+    raise Exception(f"Variable {var_out} not found")
+
+def compute_outputs(aut, bdd, outputs):
+    resu = [False]*len(aut.ap())
+    bdd_temp = bdd
+    while bdd_temp != buddy.bddtrue:
+        top = buddy.bdd_var(bdd_temp)
+        low = buddy.bdd_low(bdd_temp)
+        high = buddy.bdd_high(bdd_temp)
+        if low == buddy.bddfalse:
+            if top in outputs:
+                resu[top] = True
+            bdd_temp = high
+            continue
+        if high == buddy.bddfalse:
+            bdd_temp = low
+            continue
+        raise Exception("Not a cube!")
+    return resu
 
 # Parsing of input
 
@@ -232,7 +279,7 @@ def leq_mset(mset1, mset2):
 def is_subsumed_msets(mset, msets):
     for mset2 in msets:
         if leq_mset(mset2, mset):
-            print(f"{mset} is subsummed by {mset2}")
+            #print(f"{mset} is subsummed by {mset2}")
             return True
     return False
 
@@ -326,7 +373,6 @@ def remove_space(strg):
     return resu
 
 def get_string_bdd(strg, ap):
-    print(strg)
     clauses = remove_space(strg).split('&')
     resu = buddy.bddtrue
     for clause in clauses:
@@ -339,10 +385,10 @@ def get_string_bdd(strg, ap):
 
 def get_marking_output(marking, pn, ap):
     resu = buddy.bddtrue
-    print(f"getting outputs for {marking} :")
+    #print(f"getting outputs for {marking} :")
     for state in range(len(marking)):
         if state in pn["PlaceIO"].keys() and marking[state] > 0:
-            print(f"getting bdd for state {state}: {pn["PlaceIO"][state]}")
+            #print(f"getting bdd for state {state}: {pn["PlaceIO"][state]}")
             resu = resu & get_string_bdd(pn["PlaceIO"][state], ap)
     return resu
 
@@ -369,7 +415,7 @@ def get_io(marking_source, mset, pn, ap):
     for t in mset.keys():
         inputs = pn["Transitions"][t]["inputs"]
         outputs = pn["Transitions"][t]["outputs"]
-        print(f"In mset: {mset}, inputs: \"{inputs}\" and outputs: \"{outputs}\"")
+        #print(f"In mset: {mset}, inputs: \"{inputs}\" and outputs: \"{outputs}\"")
         if inputs:
             bdd_inputs = get_string_bdd(inputs, ap)
             resu = resu & bdd_inputs
@@ -394,11 +440,11 @@ def add_transition(csg, pn, ap, states_label, edges_labels, marking_source, mset
     if not (marking_source, marking_target) in edges_labels.keys():
         edge = csg.new_edge(state_source, state_target, label)
         edges_labels[(marking_source, marking_target)] = [label]
-        print(f"added new edge from {marking_source} (state {state_source}) to {marking_target} (state {state_target}) by {mset}")
+        #print(f"added new edge from {marking_source} (state {state_source}) to {marking_target} (state {state_target}) by {mset}")
     elif not any(existing_label == label for existing_label in edges_labels[(marking_source, marking_target)]):
         edge = csg.new_edge(state_source, state_target, label)
         edges_labels[(marking_source, marking_target)].append(label)
-        print(f"added extra edge from {marking_source} (state {state_source}) to {marking_target} (state {state_target}) by {mset}")
+        #print(f"added extra edge from {marking_source} (state {state_source}) to {marking_target} (state {state_target}) by {mset}")
     return marking_target
 
 def add_many_transitions(csg, pn, ap, states_label, edges_labels, marking_source, concset, states, markings_avoidable):
@@ -424,16 +470,18 @@ def add_many_transitions(csg, pn, ap, states_label, edges_labels, marking_source
 def hdatocsg (hda, pn) :
     bdict = spot.make_bdd_dict()
     csg = spot.make_twa_graph(bdict)
-    #csg = spot.make_twa_graph()
-    #bdict = csg.get_dict()
+
     ap = dict()
     for ap_in in pn["Inputs"]:
         ap_var = buddy.bdd_ithvar(csg.register_ap(ap_in))
         ap[ap_in] = ap_var
-    #bdd_outputs = spot.formula.ff()
+    
+    outputs = set()
     for ap_out in pn["Outputs"]:
-        ap_var = buddy.bdd_ithvar(csg.register_ap(ap_out))
+        ap_int = csg.register_ap(ap_out)
+        ap_var = buddy.bdd_ithvar(ap_int)
         ap[ap_out] = ap_var
+        outputs.add(ap_int)
         spot.set_synthesis_outputs(csg, ap_var)
 
     #states keeps track of the association marking <=> states of the automatons
@@ -447,11 +495,16 @@ def hdatocsg (hda, pn) :
     for maxcell in hda.keys() :
         concset = hda[maxcell]["Concset"]
         marking = compute_marking_pre(hda[maxcell]["Marking"], concset , pn)
-        print(f"-- New MAXCELL {marking}x{concset}")
+        #print(f"-- New MAXCELL {marking}x{concset}")
         markings_avoidable = compute_markings_avoidable(marking, hda[maxcell]["Transitions"], pn)
         add_many_transitions(csg, pn, ap, states_label, edges_labels, marking, concset, states, markings_avoidable)
-    return my_twa(csg, states_label)
+    return my_twa(csg, states_label, outputs)
 
+def dict_to_vect(dict1, dict2):
+    resu = [False]*len(dict2)
+    for ap in dict1:
+        resu[dict2[ap]] = dict1[ap]
+    return resu
 
 if __name__ == "__main__" :
     parser = argparse.ArgumentParser()
@@ -459,11 +512,11 @@ if __name__ == "__main__" :
     parser.add_argument("pn_file")
     args = parser.parse_args()
     with open(args.hda_file) as hda_file, open(args.pn_file) as pn_file:
-        print("Hello\n")
         pn = parse_petri_net(pn_file.read())
-        print(pn)
+        #print(pn)
         hda = parse_maxcell_hda(hda_file.read(), pn)
-        print(hda)
+        #print(hda)
         csg = hdatocsg(hda, pn)
-        print(csg.states_label)
+        #print(csg.states_labels)
         print(csg.twa.to_str('hoa'))
+        
