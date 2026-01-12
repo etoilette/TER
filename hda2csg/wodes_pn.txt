@@ -1,0 +1,20 @@
+PetriNetType: 0
+NumPlaces: 9
+NumTransitions: 7
+InitMark: [0,0,0,0,0,0,0,0,1]
+<Transitions>
+(0,"t-48A0-26698-11"): [0],[1]|(r1;)
+(1,"t-48A0-2669A-12"): [3],[4,5]|(l2;)
+(2,"t-48A0-2669A-13"): [1],[2]|(pressR;)
+(3,"t-48A0-2669B-14"): [5],[7]|(r2;)
+(4,"t-48A0-2669C-15"): [4],[6]|(pressL;)
+(5,"t-48A0-2669C-16"): [2,6,7],[8]|(l1;)
+(6,"t-48A0-2669D-17"): [8],[0,3]|(start;)
+</Transitions>
+<Place-Output>
+0:(R1)
+2:(L1)
+3:(L2)
+4:(Gripper)
+5:(R2)
+</Place-Output>
