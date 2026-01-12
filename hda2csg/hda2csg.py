@@ -181,11 +181,11 @@ edges:
 """
 
 def parse_maxcell_hda(hda_text, pn):
-    Maxcells = hda_text.split("\n\n")
+    lines = hda_text.split("\n")
     hda = dict()
-    for maxcell_text in Maxcells:
-        lines = maxcell_text.split("\n")
-        id = lines[0].split(" : ")
+    i_start = 0
+    while i_start<len(lines):
+        id = lines[i_start].split(" : ")
         name = int(id[0])
         hda[name] = dict()
         markconc = id[1].split(" x ")
@@ -199,8 +199,12 @@ def parse_maxcell_hda(hda_text, pn):
         hda[name]["Marking"] = marking
         hda[name]["Concset"] = concset
         hda[name]["Transitions"] = dict()
-        transitions = lines[2:]
-        if transitions[0] != '':
+
+        i_end = i_start+2
+        while i_end < len(lines) and ":" not in lines[i_end]:
+            i_end += 1
+        transitions = lines[i_start+2:i_end-1]
+        if transitions != []:
             for transition_text in transitions:
                 transition_parts = transition_text.split(";")
                 maxcell_target = int(transition_parts[3])
@@ -245,6 +249,7 @@ def parse_maxcell_hda(hda_text, pn):
                         else:
                             transition["Start"][char] = 1
                 hda[name]["Transitions"][maxcell_target].append(transition)
+        i_start = i_end
     return hda
 
 # Computing concurrent step graph
