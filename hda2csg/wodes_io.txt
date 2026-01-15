@@ -16,4 +16,5 @@ Outputs: (R1,L1,R2,L2,Gripper,Load)
 3:(L2)
 4:(Gripper)
 5:(R2)
+6:(Unload)
 </Place-Output>
