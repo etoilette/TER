@@ -1,0 +1,18 @@
+Inputs: (r1,l1,r2,l2,pressR,pressL,start)
+Outputs: (R1,L1,R2,L2,Gripper)
+<Transitions>
+(0,"t-48A0-26698-11"): (r1;)
+(1,"t-48A0-2669A-12"): (l2;)
+(2,"t-48A0-2669A-13"): (pressR;)
+(3,"t-48A0-2669B-14"): (r2;)
+(4,"t-48A0-2669C-15"): (pressL;)
+(5,"t-48A0-2669C-16"): (l1;)
+(6,"t-48A0-2669D-17"): (start;)
+</Transitions>
+<Place-Output>
+0:(R1)
+2:(L1)
+3:(L2)
+4:(Gripper)
+5:(R2)
+</Place-Output>

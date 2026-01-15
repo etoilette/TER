@@ -61,12 +61,6 @@ def compute_outputs(aut, bdd, outputs):
 
 # Parsing of input
 
-def get_io_name(strg):
-    if strg[0] == '!':
-        return strg[1:]
-    else:
-        return strg
-
 def parse_petri_net(pn_text):
     pn = dict()
     pn["Map"] = dict()
