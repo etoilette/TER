@@ -1,5 +1,5 @@
 Inputs: (r1,l1,r2,l2,pressR,pressL,start)
-Outputs: (R1,L1,R2,L2,Gripper)
+Outputs: (R1,L1,R2,L2,Gripper,Load)
 <Transitions>
 (0,"t-48A0-26698-11"): (r1;)
 (1,"t-48A0-2669A-12"): (l2;)
@@ -11,6 +11,7 @@ Outputs: (R1,L1,R2,L2,Gripper)
 </Transitions>
 <Place-Output>
 0:(R1)
+1:(Load)
 2:(L1)
 3:(L2)
 4:(Gripper)
