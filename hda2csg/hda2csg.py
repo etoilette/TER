@@ -61,21 +61,6 @@ def compute_outputs(aut, bdd, outputs):
 
 # Parsing of input
 
-pn_text = """PetriNetType: 0
-NumPlaces: 5
-NumTransitions: 4
-InitMark: [2,2,0,0,0]
-<Transitions>
-(0,"a"): [0],[2]|(i1;)
-(1,"b"): [1],[3]|(;o2)
-(2,"c"): [2,3],[4]|(i2;o1 & -o2)
-(3,"x"): [0,1],[2,3]|(;)
-</Transitions>
-<Place-Output>
-0:(o3)
-1:(-o4 & o2)
-</Place-Output>"""
-
 def get_io_name(strg):
     if strg[0] == '!':
         return strg[1:]
@@ -86,8 +71,7 @@ def parse_petri_net(pn_text):
     pn = dict()
     pn["Map"] = dict()
     pn["Transitions"] = dict()
-    pn["Inputs"] = set()
-    pn["Outputs"] = set()
+
     lines = pn_text.split("\n")
 
     i=0
@@ -106,21 +90,37 @@ def parse_petri_net(pn_text):
         name = name_texts[1][1:-2]
         pn["Map"][id] = name
         pn["Transitions"][name] = dict()
-        defs = parts[1].split("|")
-        defs_places = defs[0].split("],[")
+        defs_places = parts[1].split("],[")
         preplaces = [int(i) for i in defs_places[0][1:].split(",")]
         postplaces = [int(i) for i in defs_places[1][:-1].split(",")]
         pn["Transitions"][name]["pre"] = preplaces
         pn["Transitions"][name]["post"] = postplaces
-        defs_io = defs[1][1:-1].split(";")
+    return pn
+
+def parse_io (pn, io_text):
+
+    lines = io_text.split("\n")
+
+    pn["Inputs"] = lines[0].split(": ")[1][1:-1].split(",")
+    pn["Outputs"] = lines[1].split(": ")[1][1:-1].split(",")
+    
+    i=0
+    while lines[i] != "<Transitions>":
+        i += 1
+    i0 = i +1
+    while lines[i] != "</Transitions>":
+        i += 1
+    
+    transitions_text = lines[i0:i]
+    for transition_text in transitions_text:
+        parts = transition_text.split(": ")
+        name_texts = parts[0].split(",")
+        name = name_texts[1][1:-2]
+        defs_io = parts[1][1:-1].split(";")
         inputs = defs_io[0]
         outputs = defs_io[1]
-        inputs_names = [get_io_name(e) for e in inputs.split(" & ") if e != '']
-        outputs_names = [get_io_name(e) for e in outputs.split(" & ") if e != '']
         pn["Transitions"][name]["inputs"] = inputs
         pn["Transitions"][name]["outputs"] = outputs
-        pn["Inputs"].update(inputs_names)
-        pn["Outputs"].update(outputs_names)
     
     pn["PlaceIO"] = dict()
     while lines[i] != "<Place-Output>":
@@ -134,51 +134,6 @@ def parse_petri_net(pn_text):
             placeio = placeio_text.split(':')
             outputs = placeio[1][1:-1]
             pn["PlaceIO"][int(placeio[0])] = outputs
-            outputs_names = [get_io_name(e) for e in outputs.split(" & ") if e != '']
-            pn["Outputs"].update(outputs_names)
-    return pn
-
-hda_text = """4 : [0,0,0,0,0] x [a,a,b,b]
-edges:
-1;()|(0,0,1,1);()|(2,2)|();10
-1;()|(0,1);(0,1)|(2)|();17
-1;(0,1)|();(0,1)|(3)|();46
-0;()|(0,1);(0,1)|()|(3);46
-1;(0,1)|(0,1);()|(2,3)|();49
-0;()|(0,0,1,1);()|(2)|(3);49
-1;(0,0,1,1)|();()|(3,3)|();68
-0;(0,1)|(0,1);()|(3)|(3);68
-0;()|(0,0,1,1);()|()|(3,3);68
-
-17 : [0,0,0,0,0] x [a,b,c]
-edges:
-0;(2)|();(0,1)|()|(3);46
-1;(0,1)|();(2)|(3)|();49
-0;()|(0,1);(2)|()|(3);49
-0;(0,1,2)|();()|(3)|(3);68
-0;(2)|(0,1);()|()|(3,3);68
-
-46 : [0,0,0,0,0] x [a,b,x]
-edges:
-1;(0,1)|(3);()|(2,3)|();49
-1;()|(0,1);(3)|(2)|();49
-1;(0,1)|();(3)|(3)|();68
-0;()|(0,1);(3)|()|(3);68
-
-10 : [0,0,0,0,0] x [c,c]
-edges:
-0;(2)|();(2)|()|(0,1);17
-0;(2,2)|();()|()|(0,1,3);46
-0;(2)|();(2)|()|(3);49
-0;(2,2)|();()|()|(3,3);68
-
-49 : [0,0,0,0,0] x [c,x]
-edges:
-0;(2)|();(3)|()|(3);68
-
-68 : [0,0,0,0,0] x [x,x]
-edges:
-"""
 
 def parse_maxcell_hda(hda_text, pn):
     lines = hda_text.split("\n")
@@ -515,10 +470,12 @@ if __name__ == "__main__" :
     parser = argparse.ArgumentParser()
     parser.add_argument("hda_file")
     parser.add_argument("pn_file")
+    parser.add_argument("io_file")
     args = parser.parse_args()
-    with open(args.hda_file) as hda_file, open(args.pn_file) as pn_file:
+    with open(args.hda_file) as hda_file, open(args.pn_file) as pn_file, open(args.io_file) as io_file:
         pn = parse_petri_net(pn_file.read())
         #print(pn)
+        parse_io(pn, io_file.read())
         hda = parse_maxcell_hda(hda_file.read(), pn)
         #print(hda)
         csg = hdatocsg(hda, pn)
