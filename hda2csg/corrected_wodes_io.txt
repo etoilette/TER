@@ -1,0 +1,22 @@
+Inputs: (r1,l1,r2,l2,pressR,pressL,pressT,start)
+Outputs: (R1,L1,R2,L2,Pusher,Load,Unload,Transfert)
+<Transitions>
+(0,"t-A34-90CD1-11"): (start;)
+(1,"t-A34-90CD3-12"): (pressT;)
+(2,"t-A34-90CD4-13"): (r1;)
+(3,"t-A34-90CD5-14"): (pressR;)
+(4,"t-A34-90CD5-15"): (l2;)
+(5,"t-A34-90CD6-16"): (pressL;)
+(6,"t-A34-90CD7-17"): (r2;)
+(7,"t-A34-90CD7-18"): (l1;)
+</Transitions>
+<Place-Output>
+0:(R1)
+1:(L2)
+2:(Load)
+3:(L1)
+4:(Pusher)
+5:(R2)
+6:(Unload)
+8:(Transfert)
+</Place-Output>

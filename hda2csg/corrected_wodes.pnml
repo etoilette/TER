@@ -1,0 +1,240 @@
+<?xml version="1.0"?>
+<!--created Mon Jan 19 14:45:27 2026 by ndrio version 3.8.5-->
+<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
+ <net id="n-A34-90C91-0" type ="http://www.pnml.org/version-2009/grammar/ptnet">
+  <name>
+   <text>corrected_wodes</text>
+  </name>
+ <page id="g-A34-90CB9-1">
+  <place id="p-A34-90CBC-2">
+  <name>
+   <text>p0</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <initialMarking>
+    <text>1</text>
+   </initialMarking>
+   <graphics>
+    <position x="245" y="60"/>
+   </graphics>
+  </place>
+  <place id="p-A34-90CC9-3">
+  <name>
+   <text>p1</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="180" y="205"/>
+   </graphics>
+  </place>
+  <place id="p-A34-90CCC-4">
+  <name>
+   <text>p2</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="380" y="50"/>
+   </graphics>
+  </place>
+  <place id="p-A34-90CCD-5">
+  <name>
+   <text>p3</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="540" y="55"/>
+   </graphics>
+  </place>
+  <place id="p-A34-90CCD-6">
+  <name>
+   <text>p4</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="330" y="220"/>
+   </graphics>
+  </place>
+  <place id="p-A34-90CCE-7">
+  <name>
+   <text>p5</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <initialMarking>
+    <text>1</text>
+   </initialMarking>
+   <graphics>
+    <position x="455" y="215"/>
+   </graphics>
+  </place>
+  <place id="p-A34-90CCF-8">
+  <name>
+   <text>p6</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="595" y="205"/>
+   </graphics>
+  </place>
+  <place id="p-A34-90CCF-9">
+  <name>
+   <text>p7</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="700" y="220"/>
+   </graphics>
+  </place>
+  <place id="p-A34-90CD0-10">
+  <name>
+   <text>p8</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="350" y="335"/>
+   </graphics>
+  </place>
+  <transition id="t-A34-90CD1-11">
+  <name>
+   <text>t0</text>
+    <graphics>
+     <offset x="0" y="0" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="610" y="335"/>
+   </graphics>
+  </transition>
+  <transition id="t-A34-90CD3-12">
+  <name>
+   <text>t1</text>
+    <graphics>
+     <offset x="0" y="0" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="25" y="235"/>
+   </graphics>
+  </transition>
+  <transition id="t-A34-90CD4-13">
+  <name>
+   <text>t2</text>
+    <graphics>
+     <offset x="0" y="0" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="315" y="65"/>
+   </graphics>
+  </transition>
+  <transition id="t-A34-90CD5-14">
+  <name>
+   <text>t3</text>
+    <graphics>
+     <offset x="0" y="0" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="460" y="55"/>
+   </graphics>
+  </transition>
+  <transition id="t-A34-90CD5-15">
+  <name>
+   <text>t4</text>
+    <graphics>
+     <offset x="0" y="0" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="265" y="215"/>
+   </graphics>
+  </transition>
+  <transition id="t-A34-90CD6-16">
+  <name>
+   <text>t5</text>
+    <graphics>
+     <offset x="0" y="0" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="395" y="215"/>
+   </graphics>
+  </transition>
+  <transition id="t-A34-90CD7-17">
+  <name>
+   <text>t6</text>
+    <graphics>
+     <offset x="0" y="0" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="530" y="215"/>
+   </graphics>
+  </transition>
+  <transition id="t-A34-90CD7-18">
+  <name>
+   <text>t7</text>
+    <graphics>
+     <offset x="0" y="0" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="665" y="125"/>
+   </graphics>
+  </transition>
+  <arc id="e-A34-90CDA-19" source="p-A34-90CD0-10" target="t-A34-90CD3-12">
+  </arc>
+  <arc id="e-A34-90CDC-20" source="p-A34-90CC9-3" target="t-A34-90CD5-15">
+  </arc>
+  <arc id="e-A34-90CDD-21" source="t-A34-90CD7-18" target="p-A34-90CCF-9">
+  </arc>
+  <arc id="e-A34-9133C-22" source="p-A34-90CCD-5" target="t-A34-90CD7-18">
+  </arc>
+  <arc id="e-A34-9133E-23" source="t-A34-90CD5-14" target="p-A34-90CCD-5">
+  </arc>
+  <arc id="e-A34-9133E-24" source="p-A34-90CCC-4" target="t-A34-90CD5-14">
+  </arc>
+  <arc id="e-A34-9133F-25" source="t-A34-90CD4-13" target="p-A34-90CCC-4">
+  </arc>
+  <arc id="e-A34-9133F-26" source="p-A34-90CBC-2" target="t-A34-90CD4-13">
+  </arc>
+  <arc id="e-A34-91340-27" source="t-A34-90CD3-12" target="p-A34-90CC9-3">
+  </arc>
+  <arc id="e-A34-91341-28" source="t-A34-90CD3-12" target="p-A34-90CBC-2">
+  </arc>
+  <arc id="e-A34-91341-29" source="t-A34-90CD1-11" target="p-A34-90CD0-10">
+  </arc>
+  <arc id="e-A34-91341-30" source="p-A34-90CCF-9" target="t-A34-90CD1-11">
+  </arc>
+  <arc id="e-A34-91342-31" source="p-A34-90CCF-8" target="t-A34-90CD7-18">
+  </arc>
+  <arc id="e-A34-91342-32" source="t-A34-90CD7-17" target="p-A34-90CCF-8">
+  </arc>
+  <arc id="e-A34-91343-33" source="p-A34-90CCE-7" target="t-A34-90CD7-17">
+  </arc>
+  <arc id="e-A34-91343-34" source="t-A34-90CD6-16" target="p-A34-90CCE-7">
+  </arc>
+  <arc id="e-A34-91343-35" source="p-A34-90CCD-6" target="t-A34-90CD6-16">
+  </arc>
+  <arc id="e-A34-91344-36" source="t-A34-90CD5-15" target="p-A34-90CCD-6">
+  </arc>
+ </page>
+ </net>
+</pnml>
