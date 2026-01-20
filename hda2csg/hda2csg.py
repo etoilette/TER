@@ -506,10 +506,4 @@ if __name__ == "__main__" :
         hda = parse_maxcell_hda(hda_file.read(), pn)
         graph = hdatocsg(hda, pn)
         print(graph.twa.to_str('hoa'))
-        print(graph.step([False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False]))
-        print(graph.step([True,True,True,True,True,True,True,True,False,False,False,False,False,False,False,False]))
-        print(graph.step([True,False,True,False,True,False,False,False,False,False,False,False,False,False,False,False]))
-        print(graph.step([False,True,False,True,False,False,False,False,False,False,False,False,False,False,False,False]))
-        print(graph.step([True,False,True,True,True,False,False,False,False,False,False,False,False,False,False,False]))
-        print(graph.step([False,True,True,True,False,False,False,False,False,False,False,False,False,False,False,False]))
         
