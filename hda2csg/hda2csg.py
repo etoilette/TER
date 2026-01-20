@@ -41,9 +41,10 @@ def satisfies_bdd (valuation, bdd, outputs):
         return satisfies_bdd(valuation, low, outputs)
 
 # Args: an automaton, a bdd and outputs APs
-# Return: the valuation of output APs according to the bdd 
+# Return: the valuation of output APs according to the bdd     # psc this is the same as outputs[var]
+
 def compute_outputs(aut, bdd, outputs):
-    resu = [False]*len(aut.ap())
+    resu = [False]*len(aut.ap()) # psc this is very dangerous; You assume there are no other variables 
     bdd_temp = bdd
     while bdd_temp != buddy.bddtrue:
         top = buddy.bdd_var(bdd_temp)
@@ -64,7 +65,7 @@ def compute_outputs(aut, bdd, outputs):
 ####################
 
 # Builds a dictionary representing the Petri net specified in pn_text 
-def parse_petri_net(pn_text):
+def parse_petri_net(pn_text): # psc I'm confused: do we not use pnml?
     pn = dict()
     pn["Map"] = dict()
     pn["Transitions"] = dict()
@@ -77,11 +78,11 @@ def parse_petri_net(pn_text):
     i0 = i +1
     while lines[i] != "</Transitions>":
         i += 1
-    init_marking = tuple([int(m) for m in ((lines[i0-2]).split(": ")[1][1:-1]).split(',')])
+    init_marking = tuple([int(m) for m in ((lines[i0-2]).split(": ")[1][1:-1]).split(',')]) # psc You could do a eval
     pn["Initial"] = init_marking
-    transitions_text = lines[i0:i]
+    transitions_text = lines[i0:i] # psc I fear this makes a hard copy
     for transition_text in transitions_text:
-        parts = transition_text.split(": ")
+        parts = transition_text.split(": ") # psc you could use a re.match
         name_texts = parts[0].split(",")
         id = int(name_texts[0][1:])
         name = name_texts[1][1:-2]
@@ -98,7 +99,7 @@ def parse_petri_net(pn_text):
 def parse_io (pn, io_text):
     lines = io_text.split("\n")
 
-    pn["Inputs"] = lines[0].split(": ")[1][1:-1].split(",")
+    pn["Inputs"] = lines[0].split(": ")[1][1:-1].split(",") # psc beware of spaces
     pn["Outputs"] = lines[1].split(": ")[1][1:-1].split(",")
     
     i=0
@@ -149,7 +150,7 @@ def parse_maxcell_hda(hda_text, pn):
                 concset[a] += 1
             else:
                 concset[a] = 1
-        hda[name]["Marking"] = marking
+        hda[name]["Marking"] = marking # psc I suggest making HDA a dataclass
         hda[name]["Concset"] = concset
         hda[name]["Transitions"] = dict()
 
@@ -168,7 +169,7 @@ def parse_maxcell_hda(hda_text, pn):
                 transition["Terminate"] = dict()
                 transition["Continued"] = dict()
                 transition["Start"] = dict()
-                unst_term = transition_parts[1].split("|")
+                unst_term = transition_parts[1].split("|") #psc I would again suggest a re.match
                 unstart_list = unst_term[0][1:-1].split(",")
                 continued_list = unst_term[0][1:-1].split(",")
                 terminate_list = unst_term[1][1:-1].split(",")
@@ -214,7 +215,7 @@ def parse_maxcell_hda(hda_text, pn):
 # Compute the complementary multiset of mset in bigmset
 def compute_comp_mset(mset, bigmset):
     resu = dict()
-    for key in bigmset.keys():
+    for key in bigmset.keys(): # psc compute intersection beforehand
         if key in mset.keys():
             if mset[key] < bigmset[key]:
                 resu[key] = bigmset[key] - mset[key]
@@ -225,7 +226,7 @@ def compute_comp_mset(mset, bigmset):
 # Compute the difference mset1 - mset2
 def diff_mset(mset1, mset2):
     resu = dict()
-    for key in mset1.keys():
+    for key in mset1.keys(): # psc compute intersection beforehand
         if key in mset2.keys():
             value = mset1[key] - mset2[key]
             if value > 0:
