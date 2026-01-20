@@ -41,7 +41,7 @@ def satisfies_bdd (valuation, bdd, outputs):
         return satisfies_bdd(valuation, low, outputs)
 
 # Args: an automaton, a bdd and outputs APs
-# Return: the valuation of output APs according to the bdd     # psc this is the same as outputs[var]
+# Return: the valuation of output APs according to the bdd
 
 def compute_outputs(aut, bdd, outputs):
     resu = [False]*len(aut.ap()) # psc this is very dangerous; You assume there are no other variables 
@@ -65,7 +65,7 @@ def compute_outputs(aut, bdd, outputs):
 ####################
 
 # Builds a dictionary representing the Petri net specified in pn_text 
-def parse_petri_net(pn_text): # psc I'm confused: do we not use pnml?
+def parse_petri_net(pn_text): # psc Elargir vers pnml ou le truc de Yan je pense
     pn = dict()
     pn["Map"] = dict()
     pn["Transitions"] = dict()
@@ -237,19 +237,21 @@ def diff_mset(mset1, mset2):
 
 # Predicate whether mset1 <= mset2
 def leq_mset(mset1, mset2):
-    for key in mset1.keys():
+    for key in mset1.keys(): # psc compute intersection beforehand
         if key not in mset2.keys() or mset1[key] > mset2[key]:
             return False
     return True
 
 # Predicate whether there is mset2 in msets such that mset2 <= mset1 (a smaller version of mset is already in msets)
 def is_subsumed_msets(mset, msets):
-    for mset2 in msets:
+    for mset2 in msets: # psc any?
         if leq_mset(mset2, mset):
             return True
     return False
 
 # Generate all sub-multisets of mset for the keys keys 
+# psc Does this generate duplicates and if so is that a problem?
+# psc Wrapper function?
 def sub_multi_set(mset, keys):
     if len(keys) == 0:
         yield dict()
@@ -268,6 +270,8 @@ def sub_multi_set(mset, keys):
 # --------------------------------------- #
 
 # Compute the new marking obtained after unstarting all transitions in concset from marking in pn 
+# psc Use np.array
+# psc I feel like the three should somehow be factored
 def compute_marking_pre(marking, concset, pn) :
     new_marking = ()
     for place in range(len(marking)):
@@ -275,7 +279,7 @@ def compute_marking_pre(marking, concset, pn) :
         for transition in concset.keys():
             if place in pn["Transitions"][transition]["pre"] :
                 mplace += concset[transition]
-        new_marking = new_marking + (mplace,)
+        new_marking = new_marking + (mplace,) # psc this is not ideal performance wise
     return new_marking
 
 
@@ -316,7 +320,7 @@ def compute_marking_maxcell_transi(marking, transitions, pn) :
 # Predicate whether a face with concset {concset} is entierly included in an cell adjacent to the current one and thus, can be skipped.
 def has_face_covered(concset, transitions_list):
     set_keys = set(concset.keys())
-    for subconcset in sub_multi_set(concset, set_keys):
+    for subconcset in sub_multi_set(concset, set_keys): # psc this seems expensive
         if not any(subconcset == transition["Continued"] for transition in transitions_list):
             return False
     return True
@@ -342,13 +346,14 @@ def get_literal(strg, ap):
 
 # Gives a copy of the input string without spaces
 def remove_space(strg):
-    resu = ""
+    resu = "" # psc str.replace(" ","")
     for char in strg:
         if char !=' ':
             resu = resu + char
     return resu
 
 # Builds a bdd for the string strg over APs ap
+# psc I'm confused, what is the input? SOP?
 def get_string_bdd(strg, ap):
     clauses = remove_space(strg).split('&')
     resu = buddy.bddtrue
@@ -365,7 +370,7 @@ def get_marking_output(marking, pn, ap):
     resu = buddy.bddtrue
     for state in range(len(marking)):
         if state in pn["PlaceIO"].keys() and marking[state] > 0:
-            resu = resu & get_string_bdd(pn["PlaceIO"][state], ap)
+            resu = resu & get_string_bdd(pn["PlaceIO"][state], ap) # psc normally try except should be faster
     return resu
 
 # Build a new state in our automaton
