@@ -78,12 +78,12 @@ def compute_outputs(bdd, outputs):
 ####################
 
 # Builds a dictionary representing the Petri net specified in pn_text 
-def parse_petri_net(pn_text): # psc Elargir vers pnml ou le truc de Yan je pense
+def parse_petri_net(pn_text : str): # psc Elargir vers pnml ou le truc de Yan je pense
     pn = dict()
     pn["Map"] = dict()
     pn["Transitions"] = dict()
 
-    lines = pn_text.split("\n")
+    lines = pn_text.replace(' ','').split("\n")
 
     i=0
     while lines[i] != "<Transitions>":
@@ -91,11 +91,10 @@ def parse_petri_net(pn_text): # psc Elargir vers pnml ou le truc de Yan je pense
     i0 = i +1
     while lines[i] != "</Transitions>":
         i += 1
-    init_marking = tuple([int(m) for m in ((lines[i0-2]).split(": ")[1][1:-1]).split(',')]) # psc You could do a eval
+    init_marking = tuple([int(m) for m in ((lines[i0-2]).split(":")[1][1:-1]).split(',')]) # psc You could do a eval
     pn["Initial"] = init_marking
-    transitions_text = lines[i0:i] # psc I fear this makes a hard copy
-    for transition_text in transitions_text:
-        parts = transition_text.split(": ") # psc you could use a re.match
+    for transition_text in lines[i0:i]:
+        parts = transition_text.split(":") # psc you could use a re.match
         name_texts = parts[0].split(",")
         id = int(name_texts[0][1:])
         name = name_texts[1][1:-2]
@@ -110,10 +109,10 @@ def parse_petri_net(pn_text): # psc Elargir vers pnml ou le truc de Yan je pense
 
 # Adds to pn the inputs/outputs/ specifications given in io_text
 def parse_io (pn, io_text):
-    lines = io_text.split("\n")
+    lines = io_text.replace(' ', '').split("\n")
 
-    pn["Inputs"] = lines[0].split(": ")[1][1:-1].split(",") # psc beware of spaces
-    pn["Outputs"] = lines[1].split(": ")[1][1:-1].split(",")
+    pn["Inputs"] = lines[0].split(":")[1][1:-1].split(",") # psc beware of spaces
+    pn["Outputs"] = lines[1].split(":")[1][1:-1].split(",")
     
     i=0
     while lines[i] != "<Transitions>":
@@ -124,7 +123,7 @@ def parse_io (pn, io_text):
     
     transitions_text = lines[i0:i]
     for transition_text in transitions_text:
-        parts = transition_text.split(": ")
+        parts = transition_text.split(":")
         name_texts = parts[0].split(",")
         name = name_texts[1][1:-2]
         defs_io = parts[1][1:-1].split(";")
@@ -148,17 +147,17 @@ def parse_io (pn, io_text):
 
 # Builds the dictionnary representing the MaxCell HDA given by hda_text and representing pn
 def parse_maxcell_hda(hda_text, pn):
-    lines = hda_text.split("\n")
+    lines = hda_text.replace(' ','').split("\n")
     hda = dict()
     i_start = 0
     while i_start<len(lines):
-        id = lines[i_start].split(" : ")
+        id = lines[i_start].split(":")
         name = int(id[0])
         hda[name] = dict()
-        markconc = id[1].split(" x ")
-        marking = tuple([int(i) for i in markconc[0][1:-1].split(",")])
+        markconc = id[1].split("]x[")
+        marking = tuple([int(i) for i in markconc[0][1:].split(",")])
         concset = dict()
-        for a in markconc[1][1:-1].split(","):
+        for a in markconc[1][:-1].split(","):
             if a in concset.keys():
                 concset[a] += 1
             else:
