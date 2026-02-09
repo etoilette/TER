@@ -1,6 +1,7 @@
 import spot
 import buddy
 import argparse
+from dataclasses import dataclass
 
 # The controller #
 ##################
@@ -55,7 +56,7 @@ def satisfies_bdd (valuation, bdd, outputs_list):
 # Args: an automaton, a bdd and outputs APs
 # Return: the valuation of output APs according to the bdd
 def compute_outputs(bdd, outputs):
-    resu = {ap : False for ap in outputs}
+    resu = {ap: False for ap in outputs}
     bdd_temp = bdd
     while bdd_temp != buddy.bddtrue:
         top = buddy.bdd_var(bdd_temp)
@@ -74,14 +75,60 @@ def compute_outputs(bdd, outputs):
         raise Exception("Not a cube!")
     return resu
 
+# Important classes #
+#####################
+
+#@dataclass
+#class marking:
+#    get: tuple
+
+@dataclass
+class pnTransition:
+    pre: list
+    post: list
+
+@dataclass
+class petrinet:
+    initial: tuple
+    map: dict
+    transitions: dict
+
+@dataclass
+class ipnTransition:
+    pre: list
+    post: list
+    inputs: str
+    outputs: str
+
+@dataclass
+class ipetrinet:
+    initial: tuple
+    map: dict
+    inputs: list
+    outputs: list
+    placesOuts: dict
+    transitions: dict
+
+@dataclass
+class maxCell:
+    marking: tuple
+    concset: dict
+    transitions: dict
+
+@dataclass
+class hdaTransition:
+    unstrat: dict
+    terminate: dict
+    continued: dict
+    start: dict
+
 # Parsing of input #
 ####################
 
-# Builds a dictionary representing the Petri net specified in pn_text 
-def parse_petri_net(pn_text : str): # psc Elargir vers pnml ou le truc de Yan je pense
-    pn = dict()
-    pn["Map"] = dict()
-    pn["Transitions"] = dict()
+# Builds the Petri net specified in pn_text 
+def parse_petri_net(pn_text: str): # psc Elargir vers pnml ou le truc de Yan je pense
+    Map = dict()
+    Transitions = dict()
 
     lines = pn_text.replace(' ','').split("\n")
 
@@ -92,28 +139,28 @@ def parse_petri_net(pn_text : str): # psc Elargir vers pnml ou le truc de Yan je
     while lines[i] != "</Transitions>":
         i += 1
     init_marking = tuple([int(m) for m in ((lines[i0-2]).split(":")[1][1:-1]).split(',')]) # psc You could do a eval
-    pn["Initial"] = init_marking
     for transition_text in lines[i0:i]:
         parts = transition_text.split(":") # psc you could use a re.match
         name_texts = parts[0].split(",")
         id = int(name_texts[0][1:])
         name = name_texts[1][1:-2]
-        pn["Map"][id] = name
-        pn["Transitions"][name] = dict()
+        Map[id] = name
+
         defs_places = parts[1].split("],[")
         preplaces = [int(i) for i in defs_places[0][1:].split(",")]
         postplaces = [int(i) for i in defs_places[1][:-1].split(",")]
-        pn["Transitions"][name]["pre"] = preplaces
-        pn["Transitions"][name]["post"] = postplaces
-    return pn
+        Transitions[name] = pnTransition(preplaces, postplaces)
+    return petrinet(init_marking, Map, Transitions)
 
-# Adds to pn the inputs/outputs/ specifications given in io_text
-def parse_io (pn, io_text):
+# Builds the interpreted Petri net with base Petri net pn and where the inputs/outputs/ specifications is given by io_text
+def parse_io (pn: petrinet, io_text: str):
     lines = io_text.replace(' ', '').split("\n")
 
-    pn["Inputs"] = lines[0].split(":")[1][1:-1].split(",")
-    pn["Outputs"] = lines[1].split(":")[1][1:-1].split(",")
+    inputs_list = lines[0].split(":")[1][1:-1].split(",")
+    outputs_list = lines[1].split(":")[1][1:-1].split(",")
     
+    Transitions = dict()
+
     i=0
     while lines[i] != "<Transitions>":
         i += 1
@@ -129,10 +176,9 @@ def parse_io (pn, io_text):
         defs_io = parts[1][1:-1].split(";")
         inputs = defs_io[0]
         outputs = defs_io[1]
-        pn["Transitions"][name]["inputs"] = inputs
-        pn["Transitions"][name]["outputs"] = outputs
+        Transitions[name] = ipnTransition(pn.transitions[name].pre,pn.transitions[name].post, inputs, outputs)
     
-    pn["PlaceIO"] = dict()
+    placeOuts = dict()
     while lines[i] != "<Place-Output>":
         i += 1
     i0 = i +1
@@ -143,17 +189,26 @@ def parse_io (pn, io_text):
         for placeio_text in place_out_text:
             placeio = placeio_text.split(':')
             outputs = placeio[1][1:-1]
-            pn["PlaceIO"][int(placeio[0])] = outputs
+            placeOuts[int(placeio[0])] = outputs
+    return ipetrinet(pn.initial, pn.map, inputs_list, outputs_list, placeOuts, Transitions)
 
-# Builds the dictionnary representing the MaxCell HDA given by hda_text and representing pn
-def parse_maxcell_hda(hda_text, pn):
+def add_transitions(transi_list, pn: ipetrinet, transitions):
+    for a in transi_list:
+        if a != '':
+            char = pn.map[int(a)]
+            if char in transitions.keys():
+                transitions[char] += 1
+            else:
+                transitions[char] = 1
+
+# Builds the MaxCell HDA given by hda_text and representing pn
+def parse_maxcell_hda(hda_text: str, pn: ipetrinet):
     lines = hda_text.replace(' ','').split("\n")
-    hda = dict()
+    Cells = dict()
     i_start = 0
     while i_start<len(lines):
         id = lines[i_start].split(":")
         name = int(id[0])
-        hda[name] = dict()
         markconc = id[1].split("]x[")
         marking = tuple([int(i) for i in markconc[0][1:].split(",")])
         concset = dict()
@@ -162,10 +217,7 @@ def parse_maxcell_hda(hda_text, pn):
                 concset[a] += 1
             else:
                 concset[a] = 1
-        hda[name]["Marking"] = marking # psc I suggest making HDA a dataclass
-        hda[name]["Concset"] = concset
-        hda[name]["Transitions"] = dict()
-
+        Transitions = dict()
         i_end = i_start+2
         while i_end < len(lines) and ":" not in lines[i_end]:
             i_end += 1
@@ -174,49 +226,27 @@ def parse_maxcell_hda(hda_text, pn):
             for transition_text in transitions:
                 transition_parts = transition_text.split(";")
                 maxcell_target = int(transition_parts[3])
-                if maxcell_target not in hda[name]["Transitions"].keys():
-                    hda[name]["Transitions"][maxcell_target] = []
+                if maxcell_target not in Transitions.keys():
+                    Transitions[maxcell_target] = []
+                unst_term = transition_parts[1].split("|")
+
                 transition = dict()
-                transition["Unstart"] = dict()
-                transition["Terminate"] = dict()
-                transition["Continued"] = dict()
-                transition["Start"] = dict()
-                unst_term = transition_parts[1].split("|") #psc I would again suggest a re.match
+                unstart = dict()
                 unstart_list = unst_term[0][1:-1].split(",")
+                add_transitions(unstart_list, pn, unstart)
+                continued = dict()
                 continued_list = unst_term[0][1:-1].split(",")
+                add_transitions(continued_list, pn, continued)
+                terminate = dict()
                 terminate_list = unst_term[1][1:-1].split(",")
+                add_transitions(terminate_list, pn, terminate)
+                start = dict() #psc I would again suggest a re.match
                 start_list = transition_parts[2].split("|")[1][1:-1].split(",")
-                for a in unstart_list:
-                    if a != '':
-                        char = pn["Map"][int(a)]
-                        if char in transition["Unstart"].keys():
-                            transition["Unstart"][char] += 1
-                        else:
-                            transition["Unstart"][char] = 1
-                for a in terminate_list:
-                    if a != '':
-                        char = pn["Map"][int(a)]
-                        if char in transition["Terminate"].keys():
-                            transition["Terminate"][char] += 1
-                        else:
-                            transition["Terminate"][char] = 1
-                for a in continued_list:
-                    if a != '':
-                        char = pn["Map"][int(a)]
-                        if char in transition["Continued"].keys():
-                            transition["Continued"][char] += 1
-                        else:
-                            transition["Continued"][char] = 1
-                for a in start_list:
-                    if a != '':
-                        char = pn["Map"][int(a)]
-                        if char in transition["Start"].keys():
-                            transition["Start"][char] += 1
-                        else:
-                            transition["Start"][char] = 1
-                hda[name]["Transitions"][maxcell_target].append(transition)
+                add_transitions(start_list, pn, start)
+                Transitions[maxcell_target].append(transition)
+        Cells[name] = maxCell(marking, concset, Transitions)
         i_start = i_end
-    return hda
+    return Cells
 
 # Computing concurrent step graph #
 ###################################
@@ -273,67 +303,50 @@ def sub_multi_set(mset, keys):
 # Compute the new marking obtained after unstarting all transitions in concset from marking in pn 
 # psc Use np.array
 # psc I feel like the three should somehow be factored
-def compute_marking_pre(marking, concset, pn) :
+def compute_marking_pre(marking, concset, pn):
     new_marking = ()
     for place in range(len(marking)):
         mplace = marking[place]
         for transition in concset.keys():
-            if place in pn["Transitions"][transition]["pre"] :
+            if place in pn.transitions[transition].pre:
                 mplace += concset[transition]
         new_marking = new_marking + (mplace,) # psc this is not ideal performance wise
     return new_marking
 
 
 # Compute the new marking obtained after firing and terminating all transitions in concset from marking in pn 
-def compute_marking_transi(marking, concset, pn) :
+def compute_marking_transi(marking, concset, pn: ipetrinet):
     new_marking = ()
     for place in range(len(marking)):
         mplace = marking[place]
         for transition in concset.keys():
-            if place in pn["Transitions"][transition]["pre"] :
+            if place in pn.transitions[transition].pre:
                 mplace -= concset[transition]
                 if mplace < 0:
                     raise Exception("transition with not enough tokens")
-            if place in pn["Transitions"][transition]["post"] :
+            if place in pn.transitions[transition].post:
                 mplace += concset[transition]
         new_marking = new_marking + (mplace,)
     return new_marking
 
 # Compute the new marking obtained after applying the MaxCell transitions (in the MaxCell HDA) 
-def compute_marking_maxcell_transi(marking, transitions, pn) :
+def compute_marking_maxcell_transi(marking, transitions: hdaTransition, pn: ipetrinet):
     new_marking = ()
     for place in range(len(marking)):
         mplace = marking[place]
-        for unstart in transitions["Unstart"].keys():
-            if place in pn["Transitions"][unstart]["pre"] :
-                mplace += transitions["Unstart"][unstart]
-        for terminate in transitions["Terminate"].keys():
-            if place in pn["Transitions"][terminate]["post"] :
-                mplace += transitions["Terminate"][terminate]
-        for start in transitions["Start"].keys():
-            if place in pn["Transitions"][start]["pre"] :
-                mplace -= transitions["Start"][start]
+        for unstart in transitions.unstart.keys():
+            if place in pn.transitions[unstart].pre:
+                mplace += transitions.unstart[unstart]
+        for terminate in transitions.terminate.keys():
+            if place in pn.transitions[terminate].post:
+                mplace += transitions.terminate[terminate]
+        for start in transitions.start.keys():
+            if place in pn.transitions[start].pre:
+                mplace -= transitions.start[start]
                 if mplace < 0:
                     raise Exception("transition with not enough tokens")
         new_marking = new_marking + (mplace,)
     return new_marking
-
-# Predicate whether a face with concset {concset} is entierly included in an cell adjacent to the current one and thus, can be skipped.
-def has_face_covered(concset, transitions_list):
-    set_keys = set(concset.keys())
-    for subconcset in sub_multi_set(concset, set_keys): # psc this seems expensive
-        if not any(subconcset == transition["Continued"] for transition in transitions_list):
-            return False
-    return True
-
-# Compute the list of marking that can be exempted of recursive call
-def compute_markings_avoidable(marking, transitions_dict, pn):
-    resu = []
-    for maxcell in transitions_dict:
-        for transitions in transitions_dict[maxcell]:
-            if has_face_covered(transitions["Continued"], transitions_dict[maxcell]):
-                resu.append(compute_marking_maxcell_transi(marking, transitions, pn))
-    return resu
 
 # Logcal operations #
 # ----------------- #
@@ -367,11 +380,11 @@ def get_string_bdd(strg, ap):
     return resu
 
 # Builds the bdd for the output of a marking
-def get_marking_output(marking, pn, ap):
+def get_marking_output(marking, pn: ipetrinet, ap):
     resu = buddy.bddtrue
     for state in range(len(marking)):
-        if state in pn["PlaceIO"].keys() and marking[state] > 0:
-            resu = resu & get_string_bdd(pn["PlaceIO"][state], ap) # psc normally try except should be faster
+        if state in pn.placesOuts.keys() and marking[state] > 0:
+            resu = resu & get_string_bdd(pn.placesOuts[state], ap) # psc normally try except should be faster
     return resu
 
 # Build a new state in our automaton
@@ -398,8 +411,8 @@ class Outputs_Error (Exception):
 def get_io(marking_source, concset, pn, ap):
     resu = get_marking_output(marking_source, pn, ap)
     for t in concset.keys():
-        inputs = pn["Transitions"][t]["inputs"]
-        outputs = pn["Transitions"][t]["outputs"]
+        inputs = pn.transitions[t].inputs
+        outputs = pn.transitions[t].outputs
         if inputs:
             bdd_inputs = get_string_bdd(inputs, ap)
             resu = resu & bdd_inputs
@@ -433,28 +446,26 @@ def add_transition(graph, pn, ap, states_bdds, edges_ios, edges_concsets, markin
     return marking_target
 
 # Adds all the transitions from marking_source in the current cell with concset {concset}
-def add_many_transitions(graph, pn, ap, states_bdds, edges_ios, edges_concsets, marking_source, concset, states, markings_avoidable):
+def add_many_transitions(graph, pn, ap, states_bdds, edges_ios, edges_concsets, marking_source, concset, states):
     set_keys = set(concset.keys())
     for mset in sub_multi_set(concset, set_keys):
         if len(mset) != 0:
             marking_target = add_transition(graph, pn, ap, states_bdds, edges_ios, edges_concsets, marking_source, mset, states)
             concset_comp = compute_comp_mset(mset, concset)
-            if not marking_target in markings_avoidable:
-                markings_avoidable.append(marking_target)
-                add_many_transitions(graph, pn, ap, states_bdds, edges_ios, edges_concsets, marking_target, concset_comp, states, markings_avoidable)
+            add_many_transitions(graph, pn, ap, states_bdds, edges_ios, edges_concsets, marking_target, concset_comp, states)
 
 # Takes an HDA in MAXCELL form that represents the petri net pn in inputs and produces its concurentstep graph associated
-def hdatocsg (hda, pn) :
+def hdatocsg (hda, pn: ipetrinet):
     bdict = spot.make_bdd_dict()
     graph = spot.make_twa_graph(bdict)
 
     ap = dict()
-    for ap_in in pn["Inputs"]:
+    for ap_in in pn.inputs:
         ap_var = buddy.bdd_ithvar(graph.register_ap(ap_in))
         ap[ap_in] = ap_var
     
     outputs = set()
-    for ap_out in pn["Outputs"]:
+    for ap_out in pn.outputs:
         ap_int = graph.register_ap(ap_out)
         ap_var = buddy.bdd_ithvar(ap_int)
         ap[ap_out] = ap_var
@@ -473,16 +484,15 @@ def hdatocsg (hda, pn) :
     #states_bdds stores the bdd of inputs/outputs of each state
     states_bdds = dict()
 
-    initial_state = get_state(pn["Initial"], states, graph, pn, ap, states_bdds)
+    initial_state = get_state(pn.initial, states, graph, pn, ap, states_bdds)
     graph.set_init_state(initial_state)
-    for maxcell in hda.keys() :
-        concset = hda[maxcell]["Concset"]
-        marking = compute_marking_pre(hda[maxcell]["Marking"], concset , pn)
-        markings_avoidable = compute_markings_avoidable(marking, hda[maxcell]["Transitions"], pn)
-        add_many_transitions(graph, pn, ap, states_bdds, edges_ios, edges_concsets, marking, concset, states, markings_avoidable)
+    for maxcell in hda.keys():
+        concset = hda[maxcell].concset
+        marking = compute_marking_pre(hda[maxcell].marking, concset , pn)
+        add_many_transitions(graph, pn, ap, states_bdds, edges_ios, edges_concsets, marking, concset, states)
     return csg(graph, states_bdds, edges_concsets, outputs)
 
-if __name__ == "__main__" :
+if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("hda_file")
     parser.add_argument("pn_file")
@@ -490,8 +500,8 @@ if __name__ == "__main__" :
     args = parser.parse_args()
     with open(args.hda_file) as hda_file, open(args.pn_file) as pn_file, open(args.io_file) as io_file:
         pn = parse_petri_net(pn_file.read())
-        parse_io(pn, io_file.read())
-        hda = parse_maxcell_hda(hda_file.read(), pn)
-        graph = hdatocsg(hda, pn)
+        ipn = parse_io(pn, io_file.read())
+        hda = parse_maxcell_hda(hda_file.read(), ipn)
+        graph = hdatocsg(hda, ipn)
         print(graph.twa.to_str('hoa'))
         
