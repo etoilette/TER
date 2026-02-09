@@ -111,7 +111,7 @@ def parse_petri_net(pn_text : str): # psc Elargir vers pnml ou le truc de Yan je
 def parse_io (pn, io_text):
     lines = io_text.replace(' ', '').split("\n")
 
-    pn["Inputs"] = lines[0].split(":")[1][1:-1].split(",") # psc beware of spaces
+    pn["Inputs"] = lines[0].split(":")[1][1:-1].split(",")
     pn["Outputs"] = lines[1].split(":")[1][1:-1].split(",")
     
     i=0
@@ -226,25 +226,17 @@ def parse_maxcell_hda(hda_text, pn):
 
 # Compute the complementary multiset of mset in bigmset
 def compute_comp_mset(mset, bigmset):
-    resu = dict()
-    for key in bigmset.keys(): # psc compute intersection beforehand
-        if key in mset.keys():
-            if mset[key] < bigmset[key]:
-                resu[key] = bigmset[key] - mset[key]
-        else:
-            resu[key] = bigmset[key]
-    return resu
+    return diff_mset(bigmset, mset)
 
 # Compute the difference mset1 - mset2
 def diff_mset(mset1, mset2):
     resu = dict()
-    for key in mset1.keys(): # psc compute intersection beforehand
-        if key in mset2.keys():
-            value = mset1[key] - mset2[key]
-            if value > 0:
-                resu[key] = value
-        else:
-            resu[key] = mset1[key]
+    for key in mset1.keys() & mset2.keys():
+        value = mset1[key] - mset2[key]
+        if value > 0:
+            resu[key] = value
+    for key in set(mset1.keys()).difference(mset2.keys()):
+        resu[key] = mset1[key]
     return resu
 
 # Predicate whether mset1 <= mset2
@@ -256,10 +248,7 @@ def leq_mset(mset1, mset2):
 
 # Predicate whether there is mset2 in msets such that mset2 <= mset1 (a smaller version of mset is already in msets)
 def is_subsumed_msets(mset, msets):
-    for mset2 in msets: # psc any?
-        if leq_mset(mset2, mset):
-            return True
-    return False
+    return any (leq_mset(mset2, mset) for mset2 in msets)
 
 # Generate all sub-multisets of mset for the keys keys 
 # psc Does this generate duplicates and if so is that a problem?
