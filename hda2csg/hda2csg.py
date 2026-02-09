@@ -446,7 +446,7 @@ def add_transition(graph, pn, ap, states_bdds, edges_ios, edges_concsets, markin
     return marking_target
 
 # Adds all the transitions from marking_source in the current cell with concset {concset}
-def add_many_transitions(graph, pn, ap, states_bdds, edges_ios, edges_concsets, marking_source, concset, states):
+def add_many_transitions(graph, pn: ipetrinet, ap, states_bdds, edges_ios, edges_concsets, marking_source, concset, states):
     set_keys = set(concset.keys())
     for mset in sub_multi_set(concset, set_keys):
         if len(mset) != 0:
@@ -492,6 +492,13 @@ def hdatocsg (hda, pn: ipetrinet):
         add_many_transitions(graph, pn, ap, states_bdds, edges_ios, edges_concsets, marking, concset, states)
     return csg(graph, states_bdds, edges_concsets, outputs)
 
+
+def build_csg_from_files(hda_file, pn_file, io_file):
+    pn = parse_petri_net(pn_file.read())
+    ipn = parse_io(pn, io_file.read())
+    hda = parse_maxcell_hda(hda_file.read(), ipn)
+    return hdatocsg(hda, ipn)
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("hda_file")
@@ -499,9 +506,5 @@ if __name__ == "__main__":
     parser.add_argument("io_file")
     args = parser.parse_args()
     with open(args.hda_file) as hda_file, open(args.pn_file) as pn_file, open(args.io_file) as io_file:
-        pn = parse_petri_net(pn_file.read())
-        ipn = parse_io(pn, io_file.read())
-        hda = parse_maxcell_hda(hda_file.read(), ipn)
-        graph = hdatocsg(hda, ipn)
-        print(graph.twa.to_str('hoa'))
+        print(build_csg_from_files(hda_file, pn_file, io_file).twa.to_str('hoa'))
         
