@@ -1,7 +1,11 @@
 import spot
 import buddy
 import argparse
+import subprocess
+import glob
 from dataclasses import dataclass
+from pathlib import Path
+
 
 # The controller #
 ##################
@@ -206,7 +210,7 @@ def parse_maxcell_hda(hda_text: str, pn: ipetrinet):
     lines = hda_text.replace(' ','').split("\n")
     Cells = dict()
     i_start = 0
-    while i_start<len(lines):
+    while i_start<len(lines) and lines[i_start] != "":
         id = lines[i_start].split(":")
         name = int(id[0])
         markconc = id[1].split("]x[")
@@ -219,7 +223,7 @@ def parse_maxcell_hda(hda_text: str, pn: ipetrinet):
                 concset[a] = 1
         Transitions = dict()
         i_end = i_start+2
-        while i_end < len(lines) and ":" not in lines[i_end]:
+        while i_end < len(lines) and ":" not in lines[i_end] and lines[i_end] != "":
             i_end += 1
         transitions = lines[i_start+2:i_end-1]
         if transitions != []:
@@ -254,10 +258,6 @@ def parse_maxcell_hda(hda_text: str, pn: ipetrinet):
 # MultiSet operations #
 # ------------------- #
 
-# Compute the complementary multiset of mset in bigmset
-def compute_comp_mset(mset, bigmset):
-    return diff_mset(bigmset, mset)
-
 # Compute the difference mset1 - mset2
 def diff_mset(mset1, mset2):
     resu = dict()
@@ -271,24 +271,18 @@ def diff_mset(mset1, mset2):
 
 # Predicate whether mset1 <= mset2
 def leq_mset(mset1, mset2):
-    for key in mset1.keys(): # psc compute intersection beforehand
-        if key not in mset2.keys() or mset1[key] > mset2[key]:
-            return False
-    return True
-
-# Predicate whether there is mset2 in msets such that mset2 <= mset1 (a smaller version of mset is already in msets)
-def is_subsumed_msets(mset, msets):
-    return any (leq_mset(mset2, mset) for mset2 in msets)
+    return not any(key not in mset2.keys() or mset1[key] > mset2[key] for key in mset1.keys())
 
 # Generate all sub-multisets of mset for the keys keys 
-# psc Does this generate duplicates and if so is that a problem?
-# psc Wrapper function?
-def sub_multi_set(mset, keys):
+def sub_multi_set(mset):
+    return sub_multi_set_run(mset, set(mset.keys()))
+
+def sub_multi_set_run(mset, keys):
     if len(keys) == 0:
         yield dict()
     else:
         key = keys.pop()
-        for sub_mset in sub_multi_set(mset, keys):
+        for sub_mset in sub_multi_set_run(mset, keys):
             for i in range(mset[key]+1):
                 if i != 0:
                     sub_mset[key] = i
@@ -358,18 +352,9 @@ def get_literal(strg, ap):
     else:
         return ap[strg]
 
-# Gives a copy of the input string without spaces
-def remove_space(strg):
-    resu = "" # psc str.replace(" ","")
-    for char in strg:
-        if char !=' ':
-            resu = resu + char
-    return resu
-
-# Builds a bdd for the string strg over APs ap
-# psc I'm confused, what is the input? SOP?
-def get_string_bdd(strg, ap):
-    clauses = remove_space(strg).split('&')
+# Builds a bdd for the string strg representing a formula in conjunctive normal form over APs ap
+def get_string_bdd(strg: str, ap):
+    clauses = strg.replace(" ","").split('&')
     resu = buddy.bddtrue
     for clause in clauses:
         literals = clause.split('|')
@@ -383,8 +368,11 @@ def get_string_bdd(strg, ap):
 def get_marking_output(marking, pn: ipetrinet, ap):
     resu = buddy.bddtrue
     for state in range(len(marking)):
-        if state in pn.placesOuts.keys() and marking[state] > 0:
-            resu = resu & get_string_bdd(pn.placesOuts[state], ap) # psc normally try except should be faster
+        try:
+            if marking[state] > 0:
+                resu = resu & get_string_bdd(pn.placesOuts[state], ap) # psc normally try except should be faster
+        except Exception:
+            continue
     return resu
 
 # Build a new state in our automaton
@@ -447,11 +435,10 @@ def add_transition(graph, pn, ap, states_bdds, edges_ios, edges_concsets, markin
 
 # Adds all the transitions from marking_source in the current cell with concset {concset}
 def add_many_transitions(graph, pn: ipetrinet, ap, states_bdds, edges_ios, edges_concsets, marking_source, concset, states):
-    set_keys = set(concset.keys())
-    for mset in sub_multi_set(concset, set_keys):
+    for mset in sub_multi_set(concset):
         if len(mset) != 0:
             marking_target = add_transition(graph, pn, ap, states_bdds, edges_ios, edges_concsets, marking_source, mset, states)
-            concset_comp = compute_comp_mset(mset, concset)
+            concset_comp = diff_mset(concset, mset)
             add_many_transitions(graph, pn, ap, states_bdds, edges_ios, edges_concsets, marking_target, concset_comp, states)
 
 # Takes an HDA in MAXCELL form that represents the petri net pn in inputs and produces its concurentstep graph associated
@@ -493,18 +480,40 @@ def hdatocsg (hda, pn: ipetrinet):
     return csg(graph, states_bdds, edges_concsets, outputs)
 
 
-def build_csg_from_files(hda_file, pn_file, io_file):
-    pn = parse_petri_net(pn_file.read())
-    ipn = parse_io(pn, io_file.read())
-    hda = parse_maxcell_hda(hda_file.read(), ipn)
-    return hdatocsg(hda, ipn)
+def build_csg_from_files(pnml_file, io_file):
+    main_dir = Path(__file__).parent.parent
+    matches_pn2HDA = glob.glob(str(main_dir/ "*" / "pn2HDA"))
+    if not matches_pn2HDA:
+        raise FileNotFoundError("Could not find the C++ executable 'pn2HDA' in pn2HDA/*/")
+    pn2HDA = matches_pn2HDA[0]
+    pnfetcher = subprocess.run(
+    [pn2HDA,"standard", pnml_file, "base"],
+    capture_output=True,
+    text=True 
+    )
+    pn_text = pnfetcher.stdout
+
+    matches_pn2MAXHDA = glob.glob(str(main_dir / "*" / "pn2MAXHDA"))
+    if not matches_pn2MAXHDA:
+        raise FileNotFoundError("Could not find the C++ executable 'pn2MAXHDA' in pn2HDA/*/")
+    pn2MAXHDA = matches_pn2MAXHDA[0]
+    hdafetcher = subprocess.run(
+    [pn2MAXHDA,"standard", pnml_file, "str"],
+    capture_output=True,
+    text=True 
+    )
+    hda_text = hdafetcher.stdout
+    
+    with open(args.io_file) as io_file:
+        pn = parse_petri_net(pn_text)
+        hda = parse_maxcell_hda(hda_text, pn)
+        ipn = parse_io(pn, io_file.read())
+        return hdatocsg(hda, ipn)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("hda_file")
-    parser.add_argument("pn_file")
+    parser.add_argument("pnml_file")
     parser.add_argument("io_file")
     args = parser.parse_args()
-    with open(args.hda_file) as hda_file, open(args.pn_file) as pn_file, open(args.io_file) as io_file:
-        print(build_csg_from_files(hda_file, pn_file, io_file).twa.to_str('hoa'))
+    print(build_csg_from_files(args.pnml_file, args.io_file).twa.to_str('hoa'))
         

@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--created Tue Feb 10 15:48:22 2026 by ndrio version 3.8.5-->
+<pnml xmlns="http://www.pnml.org/version-2009/grammar/pnml">
+ <net id="n-30CC-12287-0" type ="http://www.laas.fr/tina/tpn">
+  <name>
+   <text>wodes_example</text>
+  </name>
+ <page id="g-30CC-122A3-1">
+  <place id="p-30CC-122A6-2">
+  <name>
+   <text>p0</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <initialMarking>
+    <text>1</text>
+   </initialMarking>
+   <graphics>
+    <position x="520" y="135"/>
+   </graphics>
+  </place>
+  <place id="p-30CC-122B2-3">
+  <name>
+   <text>p1</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <label>
+    <text>Transfer</text>
+    <graphics>
+     <offset x="10" y="-10" />
+    </graphics>
+   </label>
+   <graphics>
+    <position x="115" y="310"/>
+   </graphics>
+  </place>
+  <place id="p-30CC-122B5-4">
+  <name>
+   <text>p2</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <label>
+    <text>R1</text>
+    <graphics>
+     <offset x="10" y="-10" />
+    </graphics>
+   </label>
+   <graphics>
+    <position x="130" y="55"/>
+   </graphics>
+  </place>
+  <place id="p-30CC-122B6-5">
+  <name>
+   <text>p3</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <label>
+    <text>Load</text>
+    <graphics>
+     <offset x="10" y="-10" />
+    </graphics>
+   </label>
+   <graphics>
+    <position x="265" y="55"/>
+   </graphics>
+  </place>
+  <place id="p-30CC-122B6-6">
+  <name>
+   <text>p4</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <label>
+    <text>L1</text>
+    <graphics>
+     <offset x="10" y="-10" />
+    </graphics>
+   </label>
+   <graphics>
+    <position x="410" y="55"/>
+   </graphics>
+  </place>
+  <place id="p-30CC-122B7-7">
+  <name>
+   <text>p5</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="145" y="180"/>
+   </graphics>
+  </place>
+  <place id="p-30CC-122B8-8">
+  <name>
+   <text>p6</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <label>
+    <text>Pusher</text>
+    <graphics>
+     <offset x="10" y="-10" />
+    </graphics>
+   </label>
+   <graphics>
+    <position x="270" y="135"/>
+   </graphics>
+  </place>
+  <place id="p-30CC-122B9-9">
+  <name>
+   <text>p7</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="385" y="135"/>
+   </graphics>
+  </place>
+  <place id="p-30CC-122BA-10">
+  <name>
+   <text>p8</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <label>
+    <text>R2</text>
+    <graphics>
+     <offset x="10" y="-10" />
+    </graphics>
+   </label>
+   <graphics>
+    <position x="265" y="230"/>
+   </graphics>
+  </place>
+  <place id="p-30CC-122BA-11">
+  <name>
+   <text>p9</text>
+    <graphics>
+     <offset x="0" y="-10" />
+    </graphics>
+  </name>
+   <graphics>
+    <position x="375" y="220"/>
+   </graphics>
+  </place>
+  <transition id="t-30CC-122BB-12">
+  <name>
+   <text>t0</text>
+    <graphics>
+     <offset x="0" y="0" />
+    </graphics>
+  </name>
+   <label>
+    <text>start</text>
+    <graphics>
+     <offset x="10" y="-10" />
+    </graphics>
+   </label>
+   <graphics>
+    <position x="450" y="310"/>
+   </graphics>
+  </transition>
+  <transition id="t-30CC-122BD-13">
+  <name>
+   <text>t1</text>
+    <graphics>
+     <offset x="0" y="0" />
+    </graphics>
+  </name>
+   <label>
+    <text>press_T</text>
+    <graphics>
+     <offset x="10" y="-10" />
+    </graphics>
+   </label>
+   <graphics>
+    <position x="25" y="155"/>
+   </graphics>
+  </transition>
+  <transition id="t-30CC-122BE-14">
+  <name>
+   <text>t2</text>
+    <graphics>
+     <offset x="0" y="0" />
+    </graphics>
+  </name>
+   <label>
+    <text>r1</text>
+    <graphics>
+     <offset x="10" y="-10" />
+    </graphics>
+   </label>
+   <graphics>
+    <position x="200" y="50"/>
+   </graphics>
+  </transition>
+  <transition id="t-30CC-122BF-15">
+  <name>
+   <text>t3</text>
+    <graphics>
+     <offset x="0" y="0" />
+    </graphics>
+  </name>
+   <label>
+    <text>press_R</text>
+    <graphics>
+     <offset x="10" y="-10" />
+    </graphics>
+   </label>
+   <graphics>
+    <position x="350" y="55"/>
+   </graphics>
+  </transition>
+  <transition id="t-30CC-12317-16">
+  <name>
+   <text>t4</text>
+    <graphics>
+     <offset x="0" y="0" />
+    </graphics>
+  </name>
+   <label>
+    <text>l2</text>
+    <graphics>
+     <offset x="10" y="-10" />
+    </graphics>
+   </label>
+   <graphics>
+    <position x="205" y="180"/>
+   </graphics>
+  </transition>
+  <transition id="t-30CC-12319-17">
+  <name>
+   <text>t5</text>
+    <graphics>
+     <offset x="0" y="0" />
+    </graphics>
+  </name>
+   <label>
+    <text>press_L</text>
+    <graphics>
+     <offset x="10" y="-10" />
+    </graphics>
+   </label>
+   <graphics>
+    <position x="325" y="135"/>
+   </graphics>
+  </transition>
+  <transition id="t-30CC-1231A-18">
+  <name>
+   <text>t6</text>
+    <graphics>
+     <offset x="0" y="0" />
+    </graphics>
+  </name>
+   <label>
+    <text>r2</text>
+    <graphics>
+     <offset x="10" y="-10" />
+    </graphics>
+   </label>
+   <graphics>
+    <position x="320" y="220"/>
+   </graphics>
+  </transition>
+  <transition id="t-30CC-1231B-19">
+  <name>
+   <text>t7</text>
+    <graphics>
+     <offset x="0" y="0" />
+    </graphics>
+  </name>
+   <label>
+    <text>l1</text>
+    <graphics>
+     <offset x="10" y="-10" />
+    </graphics>
+   </label>
+   <graphics>
+    <position x="455" y="140"/>
+   </graphics>
+  </transition>
+  <arc id="e-30CC-1231D-20" source="t-30CC-1231B-19" target="p-30CC-122A6-2">
+  </arc>
+  <arc id="e-30CC-12321-21" source="p-30CC-122B7-7" target="t-30CC-12317-16">
+  </arc>
+  <arc id="e-30CC-12321-22" source="t-30CC-122BD-13" target="p-30CC-122B7-7">
+  </arc>
+  <arc id="e-30CC-12322-23" source="p-30CC-122B6-6" target="t-30CC-1231B-19">
+  </arc>
+  <arc id="e-30CC-12322-24" source="t-30CC-122BF-15" target="p-30CC-122B6-6">
+  </arc>
+  <arc id="e-30CC-12322-25" source="p-30CC-122B6-5" target="t-30CC-122BF-15">
+  </arc>
+  <arc id="e-30CC-12323-26" source="t-30CC-122BE-14" target="p-30CC-122B6-5">
+  </arc>
+  <arc id="e-30CC-12323-27" source="p-30CC-122B5-4" target="t-30CC-122BE-14">
+  </arc>
+  <arc id="e-30CC-12324-28" source="t-30CC-122BD-13" target="p-30CC-122B5-4">
+  </arc>
+  <arc id="e-30CC-12324-29" source="p-30CC-122B2-3" target="t-30CC-122BD-13">
+  </arc>
+  <arc id="e-30CC-12324-30" source="t-30CC-122BB-12" target="p-30CC-122B2-3">
+  </arc>
+  <arc id="e-30CC-12325-31" source="p-30CC-122BA-11" target="t-30CC-1231B-19">
+  </arc>
+  <arc id="e-30CC-12325-32" source="p-30CC-122A6-2" target="t-30CC-122BB-12">
+  </arc>
+  <arc id="e-30CC-12326-33" source="t-30CC-1231A-18" target="p-30CC-122BA-11">
+  </arc>
+  <arc id="e-30CC-12326-34" source="p-30CC-122BA-10" target="t-30CC-1231A-18">
+  </arc>
+  <arc id="e-30CC-12326-35" source="t-30CC-12317-16" target="p-30CC-122BA-10">
+  </arc>
+  <arc id="e-30CC-12327-36" source="p-30CC-122B9-9" target="t-30CC-1231B-19">
+  </arc>
+  <arc id="e-30CC-12327-37" source="t-30CC-12319-17" target="p-30CC-122B9-9">
+  </arc>
+  <arc id="e-30CC-12327-38" source="p-30CC-122B8-8" target="t-30CC-12319-17">
+  </arc>
+  <arc id="e-30CC-12328-39" source="t-30CC-12317-16" target="p-30CC-122B8-8">
+  </arc>
+ </page>
+ </net>
+</pnml>
