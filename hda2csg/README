@@ -11,3 +11,23 @@ The function build_csg_from_files() builds the controller from the specification
 
 ### Example:
 python3.12 hda2csg.py ../pnml_files/basic/abx_squared.pnml example/io_example.txt
+
+### io file format
+The file specifying the inputs and outputs of the Petri net should be in the following form (strictly between the % symbols):
+%
+Inputs: (input1,input2,...,inputn)
+Outputs: (output1,output2,...,outputm)
+<Transitions>
+(number_transition,"id_transition"): (input_formula;output_formula)
+...
+</Transitions>
+<Place-Output>
+number_place:(output_formula)
+...
+</Place-Output>
+%
+where
+- number_transition is the number of the transition by appearance in the pnml file (starting at 0)
+- number_place is the number of the place by appearance in the pnml file (starting at 0)
+- name_transition is in the <id> field of the transition in the pnml file
+- formulas are propositions or negation of propositions (by adding "!" before the proposition) separated by conjunctive operators ("&").
