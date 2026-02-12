@@ -772,19 +772,26 @@ def hdatocsg (hda: Dict[int, maxCell], pn: ipetrinet):
         add_many_transitions(graph, pn, ap, states_bdds, edges_ios, edges_concsets, marking, concset, states)
     return csg(graph, states_bdds, edges_concsets, outputs)
 
-def build_csg_from_files(pnml_file, io_file):
+def build_csg_from_files(path_to_pn2hda, pnml_file, io_file):
     """
     Builds the Concurrent Step Graph semantics for the interpreted Petri net specified by the pnml file and the i/o file.
     
     Args:
+        path_to_pn2hda: The path to directory containing the pn2HDA and pn2MAXHDA executables. 
         pnml_file: The file containing the Petri net in pnml format.
         io_file: The file specifying the inputs/outputs of the iPN.
     
     Returns:
         The Concurrent Step Graph semantics for the interpreted Petri net specified by the pnml file and the i/o file.
     """
-    main_dir = Path(__file__).parent.parent
-    matches_pn2HDA = glob.glob(str(main_dir/ "*" / "pn2HDA"))
+    if path_to_pn2hda is None:
+        main_dir = Path(__file__).parent.parent
+        matches_pn2HDA = glob.glob(str(main_dir / "*" / "pn2HDA"))
+        matches_pn2MAXHDA = glob.glob(str(main_dir / "*" / "pn2MAXHDA"))
+    else:
+        main_dir = Path(path_to_pn2hda)
+        matches_pn2HDA = glob.glob(str(main_dir / "pn2HDA"))
+        matches_pn2MAXHDA = glob.glob(str(main_dir / "pn2MAXHDA"))
     if not matches_pn2HDA:
         raise FileNotFoundError("Could not find the C++ executable 'pn2HDA' in pn2HDA/*/")
     pn2HDA = matches_pn2HDA[0]
@@ -795,7 +802,6 @@ def build_csg_from_files(pnml_file, io_file):
     )
     pn_text = pnfetcher.stdout
 
-    matches_pn2MAXHDA = glob.glob(str(main_dir / "*" / "pn2MAXHDA"))
     if not matches_pn2MAXHDA:
         raise FileNotFoundError("Could not find the C++ executable 'pn2MAXHDA' in pn2HDA/*/")
     pn2MAXHDA = matches_pn2MAXHDA[0]
@@ -814,8 +820,14 @@ def build_csg_from_files(pnml_file, io_file):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("pnml_file")
-    parser.add_argument("io_file")
+    parser.add_argument(
+    "--p-path",
+    type=str,
+    default=None,
+    help="Path to the C++ executable p (optional)"
+    )
+    parser.add_argument("pnml_file", type = str, help="The Petri net file in pnml format")
+    parser.add_argument("io_file", type = str, help="The input/output specification file")
     args = parser.parse_args()
-    print(build_csg_from_files(args.pnml_file, args.io_file).twa.to_str('hoa'))
+    print(build_csg_from_files(args.p_path, args.pnml_file, args.io_file).twa.to_str('hoa'))
         

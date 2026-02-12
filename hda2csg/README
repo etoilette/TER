@@ -2,10 +2,13 @@
 hda2csg is a function that maps a couple (hda, pn), where hda is the maxcell representation of the higher-dimensional automaton (HDA) for the Petri-net (PN) pn, to the corresponding concurrent step graph (CSG) of the HDA.
 
 ## Dependencies:
-Require the modules spot (https://spot.lre.epita.fr/index.html), argparse, dataclasses, subprocess, glob and pathlib.
+Require the modules spot (https://spot.lre.epita.fr/index.html), argparse, dataclasses, subprocess, glob, typing and pathlib.
+Also requires the executables pn2HDA and pn2MAXHDA from the parent project.
 
 ## Usage:
-Run "python3.12 hda2csg.py example/pn_file.pnml example/io_file.txt" to output the controler in Hanoi Omega-Automata format(https://spot.lre.epita.fr/hoa.html).
+Run "python3.12 hda2csg.py -p--path YOUR/PATH/TO/DIR example/pn_file.pnml example/io_file.txt", where "YOUR/PATH/TO/DIR" replaced by your path to the directory containing the executables pn2HDA and pn2MAXHDA, to output the controler in Hanoi Omega-Automata format(https://spot.lre.epita.fr/hoa.html).
+
+If the executables are in a folder in the parent directory pn2hda, the "-p--path YOUR/PATH/TO/DIR" is optional: "python3.12 hda2csg.py example/pn_file.pnml example/io_file.txt".
 
 The function build_csg_from_files() builds the controller from the specification files for the hda, the Petri net and the input/output.
 
