@@ -1,0 +1,1 @@
+/usr/bin/c++  -Werror -Wall -Wextra -pedantic -O3 -DNDEBUG -O3 CMakeFiles/pn2HDA.dir/pn2HDA.cpp.o -o pn2HDA  -Wl,-rpath,/usr/local/lib /usr/local/lib/libsymmetri.so -lpthread 

@@ -1,0 +1,4 @@
+/home/juralaine/pn2hda/build/CMakeFiles/pn2HDA.dir
+/home/juralaine/pn2hda/build/CMakeFiles/pn2MAXHDA.dir
+/home/juralaine/pn2hda/build/CMakeFiles/edit_cache.dir
+/home/juralaine/pn2hda/build/CMakeFiles/rebuild_cache.dir

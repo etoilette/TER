@@ -816,6 +816,9 @@ def build_csg_from_files(path_to_pn2hda, pnml_file, io_file):
         pn = parse_petri_net(pn_text)
         hda = parse_maxcell_hda(hda_text, pn)
         ipn = parse_io(pn, io_file.read())
+    # Dans build_csg_from_files, remplace le print de debug par :
+    print(f"Nombre de cellules parsées : {len(hda)}")
+    print(f"Cellules avec concset vide : {[cid for cid, c in hda.items() if len(c.concset) == 0]}")
     return hdatocsg(hda, ipn)
 
 if __name__ == "__main__":
